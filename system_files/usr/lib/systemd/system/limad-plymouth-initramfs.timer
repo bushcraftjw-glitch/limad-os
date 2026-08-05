@@ -1,0 +1,11 @@
+[Unit]
+Description=One-time delayed LiMaD Plymouth preparation
+
+[Timer]
+OnBootSec=120s
+AccuracySec=15s
+Persistent=true
+Unit=limad-plymouth-initramfs.service
+
+[Install]
+WantedBy=timers.target

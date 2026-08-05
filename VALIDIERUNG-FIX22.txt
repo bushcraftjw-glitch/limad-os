@@ -1,0 +1,12 @@
+LiMaD OS 2.7.0-rc1 – FIX22 validation
+Date: 2026-07-25
+
+Result: PASS
+
+- JSON files, Python files and Python heredocs valid
+- Shell syntax and strict-mode audit: PASS (54 scripts, bash 3.2 clean)
+- Full offline validation: PASS
+- FIX22 Anaconda hd:LABEL parsing and kickstart path preservation: PASS
+- inst.ks=hd:LABEL=<VOLID>:/osbuild.ks is parsed as label <VOLID> plus path :/osbuild.ks
+- Boot-config rewrite preserves :/osbuild.ks while replacing only the volume label
+- System payload, applications, GNOME defaults, themes, wallpapers and Plymouth unchanged from FIX21

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+bottle=""
+exe=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --bottle) bottle="${2:?Bottle fehlt}"; shift 2 ;;
+    --exe) exe="${2:?EXE fehlt}"; shift 2 ;;
+    *) printf 'Unbekannter Parameter: %s\n' "$1" >&2; exit 2 ;;
+  esac
+done
+[[ -n "$bottle" && -n "$exe" ]] || { echo 'Bottle oder EXE fehlt.' >&2; exit 2; }
+exec flatpak run --command=bottles-cli com.usebottles.bottles run -b "$bottle" -e "$exe"

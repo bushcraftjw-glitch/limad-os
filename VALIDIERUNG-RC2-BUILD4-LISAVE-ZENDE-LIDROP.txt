@@ -1,0 +1,81 @@
+LiMaD OS 2.8.0 RC2 Build 4 – Validierung
+============================================================
+
+Versionsstand
+-------------
+LiMaD OS: 2.8.0-rc2-gnome-rc2-build4
+LiSave: 1.0.0-preview1
+LiLink: 1.0.0-preview2
+LiDrop: 0.12.0-preview4
+LiMaD Study: 6.6.1
+Windows-Programme: 2.2.5
+
+Neue Build-4-Funktionen
+-----------------------
+PASS: LiSave-Quellcode, Desktop-App, CLI, systemd-Dienst und Timer vorhanden
+PASS: restic und libsecret/secret-tool als verbindliche Basispakete verdrahtet
+PASS: LiSave-Ziel innerhalb des Benutzerordners wird verhindert
+PASS: tägliche Sicherung um 20:00 Uhr konfigurierbar
+PASS: Sicherung vor LiMaD-Systemupdate integriert
+PASS: Aufbewahrung 7 täglich / 4 wöchentlich / 6 monatlich
+PASS: Zen-Profil, Mail, Study, Dokumente, LiDrop und LiLink Sync erfasst
+PASS: Study-eigener JWL-Library-Export wird in den Sicherungsstand aufgenommen
+PASS: Flatpak-Manifest und rpm-ostree-Status werden erfasst
+PASS: Windows-Programme-Metadaten und optionale Wine-Prefixe berücksichtigt
+PASS: Clean-Install-Erkennung für angeschlossene .lisavebackup-Pakete
+PASS: Zen als deutscher Hauptbrowser eingerichtet
+PASS: Zen-Flatpak-Profilpfad app.zen_browser.zen verwendet
+PASS: LiDrop und LiLink verwenden Downloads/LiDrop
+PASS: alter ~/LiDrop-Inhalt wird verlustfrei migriert
+PASS: LiDrop und LiLink Sync werden als GTK3-/GTK4-Dateibrowser-Favoriten eingetragen
+
+Dynamische Simulationen
+------------------------
+PASS: LiSave-Manifest erzeugt
+PASS: simuliertes verschlüsseltes Repository initialisiert
+PASS: Dokument und Zen-Profil gesichert
+PASS: lokale Quelldaten entfernt
+PASS: Clean-Install-Wiederherstellung ausgeführt
+PASS: Dokument und Zen-Profil bytegenau wiederhergestellt
+PASS: LiLink-Zwei-Geräte-TLS-Kopplung
+PASS: gegenseitige Berechtigungen und Widerruf
+PASS: 3.145.745-Byte-Dateiübertragung mit identischer SHA-256-Prüfung
+PASS: LiDrop-Streamingtest über 16 MiB
+
+Bestehende Regressionstests
+----------------------------
+PASS: Shell-, JSON- und Python-Syntax
+PASS: Projektbereinigung
+PASS: FIX22-Schutzmanifest mit Build-4-Freigaben
+PASS: Theme- und Icon-Overlay
+PASS: GStreamer und gtk4paintablesink-Verkabelung
+PASS: GNOME-Standards, Dock, Fensterknöpfe und First Login
+PASS: LiMaD Study, Cut, Mail, LiDrop, LiLink und Windows-Programme
+PASS: LiMaD App-Updater und Systemupdatepfad
+PASS: Plymouth, Installer-Branding und ISO-Werkzeuge
+PASS: Repository-Schlüssel und GitHub-Workflow-Verkabelung
+PASS: Wallpaper- und Systemidentitäts-Härtung
+
+Ausführungshinweis
+------------------
+Der vollständige Sammellauf erreichte in der Ausführungsumgebung nach mehr als
+15 Minuten die Zeitgrenze beim späteren Mail-/Flatpak-Test. Alle bis dahin
+aufgerufenen Tests waren grün. Die verbleibenden Tests wurden anschließend als
+separate Gruppe ausgeführt und bestanden vollständig.
+
+Nicht als Hardwaretest ausgegeben
+---------------------------------
+- echtes verschlüsseltes Backup auf USB-SSD oder USB-Stick
+- Wiederherstellung nach realer Clean-Installation
+- reale Zen-Passwort-/Cookie-Wiederherstellung mit Benutzerprofil
+- reale Study-Importprüfung mit persönlichem Datenbestand
+- automatische Neuinstallation sämtlicher fremder Windows-Programme
+- Notebook-/iMac-RDP, Deskflow, Wayland und Mehrmonitorbetrieb
+- tatsächlicher GitHub-Container- und ISO-Build
+
+Wichtige Grenze
+---------------
+Nicht jedes Windows-Programm besitzt einen stillen oder dauerhaft verfügbaren
+Installer. LiSave stellt Installationsliste, Konfiguration und Benutzerdaten
+bereit; Programme mit Lizenz-, Login- oder interaktiven Installationsschritten
+werden im Wiederherstellungsbericht als manuell abzuschließen ausgewiesen.

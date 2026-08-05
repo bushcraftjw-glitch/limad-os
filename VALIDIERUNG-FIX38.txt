@@ -1,0 +1,13 @@
+LiMaD OS 2.7.0 RC1 – FIX39 Validierung
+
+Geprüft werden:
+- Build-Revision fix39
+- CMake-4-Kompatibilitätsvariable für den gepinnten OWL-Build
+- Abschaltung nicht benötigter OWL/GoogleTest-Tests
+- weiterhin vorhandener OWL-Buildschritt
+- keine CMake-Workaround-Änderung in .github
+- Shell-Syntax des AirDrop-Buildskripts
+- vollständige bestehende Offline-Testreihe
+- unveränderte GitHub-Workflowdateien gegenüber FIX37
+
+Der echte OWL-Compile und der anschließende Image-/ISO-Build erfolgen im GitHub-Workflow.

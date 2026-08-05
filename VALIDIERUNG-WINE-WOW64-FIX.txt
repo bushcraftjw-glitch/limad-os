@@ -1,0 +1,28 @@
+LiMaD OS 2.8.0 RC1 Build 8 – globaler Wine-11-WoW64-Fix
+
+Ausgangsfehler aus dem Benutzerprotokoll:
+- Plan erkannte eine win32-EXE.
+- Der gemeinsame Prefix lief trotzdem mit WINEARCH=win64.
+- Winetricks corefonts brach bei C:\windows\syswow64\regedit.exe mit Status 53 ab.
+- Der gleiche corefonts-Abbruch trat auch bei anderen EXE-Dateien auf.
+
+Korrektur:
+- gemeinsamer Prefix verwendet WINEARCH=wow64
+- Prefix gilt erst als bereit, wenn system.reg und syswow64/regedit.exe vorhanden sind
+- image build smoke test prüft syswow64/regedit.exe
+- wine-winefonts wird explizit mitgeliefert
+- corefonts wurde aus allen automatischen Profilen entfernt
+- NWS-Rezept und Zuordnung zum bestehenden dotnet-Profil unverändert
+
+Validierung:
+- test-shell-syntax: PASS
+- test-clean-project: PASS
+- FIX22 protected baseline: PASS
+- test-wine-integration: PASS
+- test-windows-recipe-engine: PASS
+- alle übrigen Offline-Tests: PASS
+- LiDrop Streaming-Test: PASS
+- ZIP-Integrität: nach Paketbau geprüft
+
+Nicht offline beweisbar:
+- tatsächliche Prefix-Erzeugung und Installation auf dem Notebook erst nach GitHub-Image-Build und Installation.

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LiMaD Study</title>
+<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/assistant.css">
+<link rel="stylesheet" href="/css/writer.css">
+<link rel="icon" type="image/png" href="/assets/limad-study-icon.png">
+</head>
+<body>
+<div id="startup-status" role="status" style="position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#f6f7fb;color:#24243a;font:600 16px system-ui,sans-serif"><div style="text-align:center"><div style="font-size:24px;margin-bottom:10px" data-i18n="startup.loading">LiMaD Study wird geladen …</div><div id="startup-detail" style="font-weight:400;color:#666" data-i18n="startup.initializing">Oberfläche wird initialisiert</div></div></div>
+<div id="app" class="app-shell">
+<header class="app-bar">
+  <button class="brand" data-route="home" aria-label="Startseite" data-i18n-aria-label="nav.home">
+    <img class="brand-icon" src="/assets/limad-study-icon.png" alt="" aria-hidden="true">
+    <span>LiMaD Study</span>
+  </button>
+  <div class="app-bar-spacer"></div>
+  <button class="icon-button" id="global-search" title="Suchen" aria-label="Suchen" data-i18n-title="common.search" data-i18n-aria-label="common.search"></button>
+  <button class="icon-button" id="global-bookmark" title="Lesezeichen" aria-label="Lesezeichen" data-i18n-title="nav.bookmarks" data-i18n-aria-label="nav.bookmarks"></button>
+  <button class="icon-button" id="global-history" title="Letzte Aktivitäten" aria-label="Letzte Aktivitäten" data-i18n-title="common.recentActivities" data-i18n-aria-label="common.recentActivities"></button>
+  <button class="icon-button" id="global-sync" title="Katalog aktualisieren" aria-label="Katalog aktualisieren" data-i18n-title="common.updateCatalog" data-i18n-aria-label="common.updateCatalog"></button>
+  <button class="icon-button" id="global-menu" title="Weitere Aktionen" aria-label="Weitere Aktionen" data-i18n-title="common.moreActions" data-i18n-aria-label="common.moreActions"></button>
+</header>
+<aside class="sidebar" aria-label="Hauptnavigation" data-i18n-aria-label="nav.main">
+  <nav id="main-nav"></nav>
+  <div class="sidebar-user">
+    <span class="avatar">L</span>
+    <span><strong>LiMaD</strong><small><i></i> Online</small></span>
+  </div>
+</aside>
+<main class="main-content" id="main-content" tabindex="-1"></main>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+<input id="jwpub-input" type="file" accept=".jwpub" hidden>
+<input id="jwlibrary-input" type="file" accept=".jwlibrary" hidden>
+<input id="jwlplaylist-input" type="file" accept=".jwlplaylist" hidden>
+<script src="/js/startup.js"></script>
+<script src="/js/i18n.js" defer></script>
+<script src="/js/app.bundle.js" defer></script>
+<script src="/js/bible-reference.js" defer></script>
+<script src="/js/assistant.js" defer></script>
+<script src="/js/writer.js" defer></script>
+</body>
+</html>

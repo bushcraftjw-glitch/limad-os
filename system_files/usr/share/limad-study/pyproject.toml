@@ -1,0 +1,9 @@
+[project]
+name = "limad-study"
+version = "6.6.3"
+description = "LiMaD Study Linux"
+requires-python = ">=3.11"
+license = {text = "GPL-3.0-or-later"}
+
+[project.scripts]
+limad-study = "limad_study.__main__:main"

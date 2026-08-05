@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="yes">LiDrop auf %h</name>
+  <service>
+    <type>_limad-drop._tcp</type>
+    <port>47777</port>
+    <txt-record>version=0.12.0-preview5</txt-record>
+    <txt-record>path=/</txt-record>
+  </service>
+</service-group>

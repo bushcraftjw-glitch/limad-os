@@ -1,0 +1,290 @@
+{
+  "theme": "LiMaD",
+  "inherits": "WhiteSur-dark",
+  "applications": {
+    "de.limad.Cut": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-cut"
+      ]
+    },
+    "de.limad.Drop": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-drop"
+      ]
+    },
+    "de.limad.Study": {
+      "scalable": true,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-study"
+      ]
+    },
+    "de.limad.AnycubicSlicerNext": {
+      "scalable": true,
+      "sizes": []
+    },
+    "de.limad.Nws": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-nws"
+      ]
+    },
+    "de.limad.Office": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-office"
+      ]
+    },
+    "de.limad.Music": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-music"
+      ]
+    },
+    "de.limad.Settings": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-settings"
+      ]
+    },
+    "de.limad.Store": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-store"
+      ]
+    },
+    "de.limad.Apps": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-apps"
+      ]
+    },
+    "de.limad.WindowsApps": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "windows-apps"
+      ]
+    },
+    "de.limad.Logo": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-os"
+      ]
+    },
+    "de.limad.StartButton": {
+      "scalable": false,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "limad-start"
+      ]
+    },
+    "de.limad.Terminal": {
+      "scalable": true,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": []
+    },
+    "de.limad.ScreenShare": {
+      "scalable": true,
+      "sizes": [],
+      "aliases": [
+        "limad-screen-share"
+      ]
+    },
+    "de.limad.Mail": {
+      "scalable": true,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": []
+    },
+    "de.limad.Link": {
+      "scalable": true,
+      "sizes": [],
+      "aliases": [
+        "lilink"
+      ]
+    },
+    "de.limad.Save": {
+      "scalable": true,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": []
+    },
+    "de.limad.Notes": {
+      "scalable": true,
+      "sizes": [
+        16,
+        22,
+        24,
+        32,
+        48,
+        64,
+        128,
+        256,
+        512
+      ],
+      "aliases": [
+        "linotes"
+      ]
+    }
+  }
+}

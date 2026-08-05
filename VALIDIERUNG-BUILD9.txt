@@ -1,0 +1,17 @@
+LiMaD OS 2.8.0 RC1 Build 9 – Offline-Validierung
+
+Bestanden:
+- Shell-Syntax und macOS-Bash-3.2-Audit
+- JSON- und Python-Syntax
+- FIX22-Schutzmanifest mit freigegebenen Build-9-Änderungen
+- GNOME-, Theme-, Icon-, Dock- und Desktop-Prüfungen
+- LiMaD Study 6.5.0
+- LiDrop 0.12.0-preview4 inklusive Mobile-Dateinamen-Fix und Icon-Synchronisierung
+- Wine-WoW64-Paket- und Prefix-Prüfungen
+- Windows-Programme Installer 2.0 mit getrennten Prefixen
+- Rezeptanalyse und NWS-Profil
+- App-Updater, Plymouth, ISO- und Runtime-Prüfungen
+- verbleibende Langzeittests einzeln erfolgreich
+
+Hinweis:
+Ein echter Wine-Praxistest mit konkreten Fremdprogrammen erfolgt nach dem Image-Build auf LiMaD OS. Offline wurde die Paket- und Programmlogik geprüft; die Kompatibilität jeder beliebigen Windows-Anwendung kann technisch nicht garantiert werden.

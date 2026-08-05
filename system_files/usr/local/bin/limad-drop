@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+SYSTEM_ROOT="/usr/share/limad-drop"
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.Drop/current/payload"
+APP_ROOT="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" "shell.py")"
+export LIMAD_DROP_RESOURCE_ROOT="$APP_ROOT"
+exec /usr/bin/python3 "$APP_ROOT/shell.py" "$@"

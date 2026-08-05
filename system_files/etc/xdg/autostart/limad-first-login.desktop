@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Desktop-Einrichtung
+Comment=Wendet die LiMaD-Desktopvorgaben einmalig an
+Exec=/usr/local/bin/limad-first-login-setup
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3
+OnlyShowIn=GNOME;

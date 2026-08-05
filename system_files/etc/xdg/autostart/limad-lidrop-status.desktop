@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=LiDrop Statusintegration
+Comment=Aktiviert und überprüft das LiDrop-Symbol in der GNOME-Leiste
+Exec=/usr/local/bin/limad-lidrop-status-ensure
+OnlyShowIn=GNOME;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=8
+NoDisplay=true

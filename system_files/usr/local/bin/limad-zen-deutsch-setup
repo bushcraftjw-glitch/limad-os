@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+import configparser
+import os
+import shutil
+import subprocess
+from pathlib import Path
+
+HOME = Path.home()
+SOURCE = Path("/usr/share/limad/firefox/chrome")
+APP_IDS = ("app.zen_browser.zen", "io.github.zen_browser.zen")
+BEGIN = "// BEGIN LiMaD OS managed Zen preferences"
+END = "// END LiMaD OS managed Zen preferences"
+PREFS = f'''{BEGIN}
+user_pref("intl.locale.requested", "de");
+user_pref("intl.accept_languages", "de-DE, de, en-US, en");
+user_pref("spellchecker.dictionary", "de-DE");
+user_pref("browser.search.region", "DE");
+user_pref("browser.search.isUS", false);
+user_pref("browser.download.useDownloadDir", true);
+user_pref("browser.download.folderList", 1);
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+user_pref("browser.theme.content-theme", 0);
+user_pref("browser.theme.toolbar-theme", 0);
+user_pref("ui.systemUsesDarkTheme", 1);
+user_pref("browser.tabs.inTitlebar", 1);
+{END}
+'''
+
+
+def run(args: list[str]) -> subprocess.CompletedProcess:
+    return subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+
+
+def installed_app_id() -> str:
+    if not shutil.which("flatpak"):
+        return APP_IDS[0]
+    for app_id in APP_IDS:
+        for scope in ("--user", "--system"):
+            if run(["flatpak", "info", scope, app_id]).returncode == 0:
+                return app_id
+    return APP_IDS[0]
+
+
+def profile_root(app_id: str) -> Path:
+    return HOME / ".var" / "app" / app_id / "zen"
+
+
+def profile_paths(root: Path) -> list[Path]:
+    root.mkdir(parents=True, exist_ok=True)
+    ini = root / "profiles.ini"
+    if not ini.exists():
+        relative = "Profiles/limad.default-release"
+        ini.write_text(
+            "[General]\nStartWithLastProfile=1\nVersion=2\n\n"
+            "[Profile0]\nName=default-release\nIsRelative=1\n"
+            f"Path={relative}\nDefault=1\n",
+            encoding="utf-8",
+        )
+    parser = configparser.RawConfigParser()
+    try:
+        parser.read(ini, encoding="utf-8")
+    except configparser.Error:
+        return []
+    profiles = []
+    for section in parser.sections():
+        if not section.startswith("Profile") or not parser.has_option(section, "Path"):
+            continue
+        raw = parser.get(section, "Path")
+        relative = parser.get(section, "IsRelative", fallback="1") == "1"
+        profile = root / raw if relative else Path(os.path.expanduser(raw))
+        profile.mkdir(parents=True, exist_ok=True)
+        profiles.append(profile)
+    return profiles
+
+
+def update_user_js(profile: Path) -> None:
+    path = profile / "user.js"
+    old = path.read_text(encoding="utf-8", errors="replace") if path.exists() else ""
+    while BEGIN in old and END in old:
+        start = old.index(BEGIN)
+        finish = old.index(END, start) + len(END)
+        old = (old[:start] + old[finish:]).strip()
+    path.write_text((old + "\n\n" if old else "") + PREFS, encoding="utf-8")
+
+
+def install_style(profile: Path) -> None:
+    if not SOURCE.is_dir():
+        return
+    chrome = profile / "chrome"
+    chrome.mkdir(parents=True, exist_ok=True)
+    for name in ("userChrome.css", "userContent.css"):
+        source = SOURCE / name
+        if source.is_file():
+            shutil.copy2(source, chrome / name)
+
+
+def set_default(app_id: str) -> None:
+    desktop = f"{app_id}.desktop"
+    if shutil.which("flatpak"):
+        run(["flatpak", "override", "--user", "--env=LANG=de_DE.UTF-8", "--env=LANGUAGE=de:de_DE", "--env=LC_MESSAGES=de_DE.UTF-8", app_id])
+    if shutil.which("xdg-settings"):
+        run(["xdg-settings", "set", "default-web-browser", desktop])
+    if shutil.which("xdg-mime"):
+        for mime in ("x-scheme-handler/http", "x-scheme-handler/https", "text/html", "application/xhtml+xml"):
+            run(["xdg-mime", "default", desktop, mime])
+
+
+def main() -> int:
+    app_id = installed_app_id()
+    for profile in profile_paths(profile_root(app_id)):
+        update_user_js(profile)
+        install_style(profile)
+    set_default(app_id)
+    state = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config")) / "limad"
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "zen-browser.env").write_text(f"ZEN_ID={app_id}\nZEN_LANGUAGE=de-DE\n", encoding="utf-8")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,56 @@
+@-moz-document url-prefix("about:accountcentral"), url-prefix("about:welcome"), url-prefix("about:preferences"), url-prefix("about:addons"), url-prefix("about:addressbook"), url-prefix("about:calendar") {
+  :root {
+    color-scheme: dark !important;
+    --in-content-page-background: #121018 !important;
+    --in-content-page-color: #f3edf9 !important;
+    --in-content-text-color: #f3edf9 !important;
+    --in-content-deemphasized-text: #c8bdd3 !important;
+    --in-content-box-background: #181420 !important;
+    --in-content-box-background-odd: #201a2a !important;
+    --in-content-box-border-color: #493a59 !important;
+    --in-content-primary-button-background: #8b5cf6 !important;
+    --in-content-primary-button-background-hover: #a878ff !important;
+    --in-content-primary-button-text-color: #ffffff !important;
+    --in-content-button-background: #2a2236 !important;
+    --in-content-button-background-hover: #352a45 !important;
+    --in-content-focus-outline-color: #a878ff !important;
+    --link-color: #c5a7ff !important;
+    background: #121018 !important;
+    color: #f3edf9 !important;
+  }
+  html,
+  body,
+  main,
+  section,
+  article,
+  .main-content,
+  .container,
+  .card,
+  .panel {
+    background-color: #121018 !important;
+    color: #f3edf9 !important;
+    border-color: #342b3e !important;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    border-radius: 9px !important;
+  }
+  button:not(.primary),
+  input,
+  select,
+  textarea {
+    background-color: #201a2a !important;
+    color: #f3edf9 !important;
+    border-color: #493a59 !important;
+  }
+  button.primary,
+  button[type="submit"] {
+    background-color: #8b5cf6 !important;
+    color: #ffffff !important;
+  }
+  a {
+    color: #c5a7ff !important;
+  }
+}

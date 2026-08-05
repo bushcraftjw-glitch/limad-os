@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LiSave-Wiederherstellung erkennen
+Comment=Erkennt nach einer sauberen Installation ein angeschlossenes LiSave-Backup
+Exec=/usr/local/bin/limad-save-first-login-detect
+OnlyShowIn=GNOME;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

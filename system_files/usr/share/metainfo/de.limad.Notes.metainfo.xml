@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.limad.Notes</id>
+  <name>LiNotes</name>
+  <summary>Notizen für LiMaD OS</summary>
+  <description><p>Native Notizen-App mit Ordnern, Schnellnotizen, Suche, Galerie, Anhängen, Import, Export, LiLink und LiSave.</p></description>
+  <launchable type="desktop-id">de.limad.Notes.desktop</launchable>
+  <provides><binary>limad-notes</binary></provides>
+  <releases><release version="1.0.0-preview2" date="2026-08-05"><description><p>Automatisch angepasste helle und dunkle Oberfläche.</p></description></release></releases>
+</component>

@@ -1,0 +1,24 @@
+[Desktop Entry]
+Actions=Update;RemoteDesktop;
+Type=Application
+Name=LiLink
+GenericName=LiMaD-Geräte verbinden
+Comment=Bildschirm, Dateien, Maus, Tastatur und Arbeitsstände zwischen LiMaD-Geräten verbinden
+Exec=/usr/local/bin/lilink
+Icon=de.limad.Link
+Terminal=false
+Categories=Network;RemoteAccess;Utility;
+StartupNotify=true
+StartupWMClass=de.limad.Link
+Keywords=LiLink;Bildschirm;Fernsteuerung;RDP;Continuity;Geräte;Deskflow;Handoff;
+X-LiMaD-Version=1.0.0-preview3
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.Link
+Icon=system-software-update
+
+[Desktop Action RemoteDesktop]
+Name=GNOME Remote Desktop öffnen
+Exec=gnome-control-center system remote-desktop
+Icon=preferences-system

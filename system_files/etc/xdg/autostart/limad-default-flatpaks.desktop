@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Standard-Apps installieren
+Comment=Installiert LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, EasyEffects und Bazaar automatisch für den aktuellen Benutzer
+Exec=/usr/local/bin/limad-install-default-flatpaks
+TryExec=/usr/local/bin/limad-install-default-flatpaks
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=12
+OnlyShowIn=GNOME;

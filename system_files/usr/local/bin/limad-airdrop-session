@@ -1,0 +1,62 @@
+#!/usr/bin/python3
+from __future__ import annotations
+import json
+import shutil
+import subprocess
+import sys
+
+
+def run(args, timeout=45):
+    return subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+
+
+def probe():
+    result = run(["/usr/local/bin/limad-airdrop-check"], 10)
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or "AirDrop-Prüfung fehlgeschlagen")
+    return json.loads(result.stdout)
+
+
+def main():
+    action = sys.argv[1] if len(sys.argv) > 1 else "probe"
+    if action == "probe":
+        print(json.dumps(probe(), ensure_ascii=False))
+        return 0
+    if action == "start":
+        state = probe()
+        if not state.get("available"):
+            raise RuntimeError(state.get("message") or "AirDrop ist nicht verfügbar")
+        interface = state.get("interface")
+        pkexec = shutil.which("pkexec")
+        if not pkexec:
+            raise RuntimeError("pkexec/Polkit ist nicht installiert")
+        privileged = run([pkexec, "/usr/local/bin/limad-airdrop-control", "start", interface], 90)
+        if privileged.returncode:
+            raise RuntimeError(privileged.stderr.strip() or privileged.stdout.strip() or "OWL konnte nicht gestartet werden")
+        receiver = run(["systemctl", "--user", "restart", "limad-opendrop-receive.service"], 20)
+        if receiver.returncode:
+            run([pkexec, "/usr/local/bin/limad-airdrop-control", "stop"], 30)
+            raise RuntimeError(receiver.stderr.strip() or "OpenDrop-Empfänger konnte nicht gestartet werden")
+        # AirDrop visibility is intentionally temporary. A transient user timer
+        # stops the compatibility stack after ten minutes.
+        run(["systemd-run", "--user", "--unit=limad-airdrop-auto-stop", "--on-active=10m", "/usr/local/bin/limad-airdrop-session", "stop"], 10)
+        print(json.dumps(probe(), ensure_ascii=False))
+        return 0
+    if action == "stop":
+        run(["systemctl", "--user", "stop", "limad-opendrop-receive.service"], 20)
+        pkexec = shutil.which("pkexec")
+        if pkexec:
+            result = run([pkexec, "/usr/local/bin/limad-airdrop-control", "stop"], 90)
+            if result.returncode:
+                raise RuntimeError(result.stderr.strip() or "OWL konnte nicht gestoppt werden")
+        print(json.dumps(probe(), ensure_ascii=False))
+        return 0
+    raise RuntimeError("Unbekannte Aktion")
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except Exception as exc:
+        print(str(exc), file=sys.stderr)
+        raise SystemExit(1)

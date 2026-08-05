@@ -1,0 +1,64 @@
+#!/usr/bin/python3
+"""Select the newest valid system/user LiMaD application payload.
+
+Usage: limad-select-app-root SYSTEM_ROOT USER_ROOT REQUIRED_RELATIVE_FILE
+The updater payload is preferred only when it is at least as new as the image
+payload. This prevents an old per-user update from hiding a newer OS-integrated
+application after an image upgrade.
+"""
+from __future__ import annotations
+import re
+import sys
+from pathlib import Path
+
+
+def read_version(root: Path) -> str:
+    try:
+        return (root / "VERSION").read_text(encoding="utf-8").strip()
+    except OSError:
+        return "0"
+
+
+def version_key(value: str) -> tuple:
+    value = value.strip().lower().replace("_", "-")
+    main, sep, suffix = value.partition("-")
+    core = [int(part) for part in re.findall(r"\d+", main)[:4]]
+    core += [0] * (4 - len(core))
+    if not sep:
+        stage, serial = 4, 0
+    else:
+        match = re.search(r"(alpha|a|beta|b|preview|pre|rc)?[^0-9]*(\d+)?", suffix)
+        label = (match.group(1) if match else "") or "pre"
+        serial = int((match.group(2) if match else "0") or 0)
+        stage = {
+            "alpha": 0, "a": 0,
+            "beta": 1, "b": 1,
+            "preview": 2, "pre": 2,
+            "rc": 3,
+        }.get(label, 2)
+    return (*core, stage, serial, value)
+
+
+def main() -> int:
+    if len(sys.argv) != 4:
+        print("usage: limad-select-app-root SYSTEM_ROOT USER_ROOT REQUIRED_FILE", file=sys.stderr)
+        return 2
+    system = Path(sys.argv[1])
+    user = Path(sys.argv[2])
+    required = Path(sys.argv[3])
+    if not (system / required).is_file():
+        print(f"system payload incomplete: {system / required}", file=sys.stderr)
+        return 3
+    selected = system
+    if (user / required).is_file():
+        try:
+            if version_key(read_version(user)) >= version_key(read_version(system)):
+                selected = user
+        except Exception:
+            selected = system
+    print(selected)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

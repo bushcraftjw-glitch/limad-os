@@ -1,0 +1,24 @@
+[Unit]
+Description=LiDrop OpenDrop receiver
+After=graphical-session.target
+PartOf=graphical-session.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+ConditionFileIsExecutable=/usr/libexec/limad-airdrop/backend/opendrop
+
+[Service]
+Type=simple
+ExecStartPre=/usr/local/bin/limad-airdrop-wait
+ExecStart=/usr/local/bin/limad-opendrop-receive
+Restart=no
+RuntimeMaxSec=600
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=false
+RestrictSUIDSGID=true
+LockPersonality=true
+UMask=0077
+
+[Install]
+WantedBy=graphical-session.target

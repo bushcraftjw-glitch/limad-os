@@ -1,0 +1,37 @@
+== LiMaD OS 2.7.0-rc1 – offline validation ==
+JSON files, Python files and Python heredocs valid
+Shell syntax and strict-mode audit: PASS (53 scripts, bash 3.2 clean)
+Clean GNOME project audit: PASS
+Pinned theme sources, licences and base image: PASS
+LiMaD own-application icon audit: PASS (13 applications, 219 files)
+GNOME default settings and 3 wallpapers: PASS
+Desktop first-login, dock and original LiMaD L: PASS
+Firefox native + Flatpak LiMaD theme: PASS
+LiMaD applications and Windows installer: PASS (5 applications)
+Grafischer LiMaD-App-Updater und Paketformat: PASS
+LiMaD Plymouth boot splash: PASS
+Phase 1 boot, wallpaper, menu and installer branding: PASS
+Wine packages, prefix smoke and installer detection: PASS
+Anycubic Slicer Next package integrity and GNOME integration: PASS
+Repository key immutable-path and post-commit guard: PASS
+bootc-image-builder Fedora distro identity: PASS
+bootc-image-builder file-key bridge: PASS
+Build wiring and CI workflow: PASS
+Phase 2 update and NWS integration: PASS
+Phase 3 app updater, local scan, atomic failed-install recovery and system-version restore: PASS
+Phase 4 release candidate wiring: PASS
+FIX10 branding hardening retained in FIX11: PASS
+FIX15 EFI short-label and boot-payload validation: PASS
+FIX16/18 native-label, adaptive-product-overlay, treeinfo, EFI and media-check audit: PASS
+FIX17/18 controlled BIB exit recovery with current Anaconda source ISO validation: PASS
+FIX18 current Anaconda images/install.img layout and adaptive product.img overlay: PASS
+FIX19 xorriso -find action and ISO path discovery: PASS
+FIX20 xorriso system-area ESP GUID parsing: PASS
+FIX21 optional treeinfo handling for native bootc-image-builder ISO metadata: PASS
+FIX11 desktop launcher and category hardening: PASS
+synthetic conflicting override normalization: PASS
+Wallpaper override conflict hardening: PASS
+Fedora-compatible LiMaD identity, Fastfetch and enforced GDM defaults: PASS
+
+LiMaD OS GNOME: vollständige Offline-Validierung erfolgreich.
+Image-, GNOME- und ISO-Prüfungen laufen im GitHub-Workflow.

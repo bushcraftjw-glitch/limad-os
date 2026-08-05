@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+readonly SYSTEM_MARKER=/var/lib/limad/plymouth-reboot-required
+[[ -s "$SYSTEM_MARKER" ]] || exit 0
+command -v notify-send >/dev/null 2>&1 || exit 0
+boot_id="$(cat "$SYSTEM_MARKER" 2>/dev/null || true)"
+[[ -n "$boot_id" ]] || exit 0
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/limad"
+user_marker="$state_dir/plymouth-reboot-notified-${boot_id}.done"
+[[ -e "$user_marker" ]] && exit 0
+mkdir -p "$state_dir"
+notify-send -u normal -i system-reboot \
+  'LiMaD-Bootscreen ist vorbereitet' \
+  'Bitte den Computer einmal neu starten. Danach wird die neue OSTree-Initramfs mit dem LiMaD-Bootscreen verwendet.'
+touch "$user_marker"

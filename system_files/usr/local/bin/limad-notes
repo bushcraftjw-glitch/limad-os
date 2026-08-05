@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SYSTEM_ROOT=/usr/share/limad-notes
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.Notes/current/payload"
+ROOT="$SYSTEM_ROOT"
+if [[ -x /usr/local/libexec/limad-select-app-root ]]; then
+  candidate="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" VERSION 2>/dev/null || true)"
+  [[ -n "$candidate" && -d "$candidate" ]] && ROOT="$candidate"
+elif [[ -s "$USER_ROOT/VERSION" ]]; then
+  ROOT="$USER_ROOT"
+fi
+exec python3 "$ROOT/app.py" "$@"

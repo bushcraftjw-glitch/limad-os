@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Mit LiMaD Windows installieren
+Comment=EXE- oder MSI-Datei mit Windows-Programme analysieren und getrennt installieren
+Exec=/usr/local/bin/limad-winrun %f
+TryExec=/usr/local/bin/limad-winrun
+Icon=de.limad.WindowsApps
+Terminal=false
+NoDisplay=true
+StartupNotify=true
+Categories=System;Emulator;
+MimeType=application/x-ms-dos-executable;application/x-msdownload;application/x-msi;application/x-ms-shortcut;application/vnd.microsoft.portable-executable;

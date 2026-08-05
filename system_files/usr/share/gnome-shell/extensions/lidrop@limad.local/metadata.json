@@ -1,0 +1,14 @@
+{
+  "uuid": "lidrop@limad.local",
+  "name": "LiDrop Status",
+  "description": "Zuverlässiger nativer LiDrop-Schnellzugriff in der GNOME-Systemleiste",
+  "shell-version": [
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50"
+  ],
+  "version": 3
+}

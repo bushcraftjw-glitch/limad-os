@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+APP_ROOT=/usr/lib/limad/apps/anycubic-slicer-next
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.AnycubicSlicerNext/current/payload"
+[[ -x "$USER_ROOT/bin/AnycubicSlicerNext" && -d "$USER_ROOT/resources" ]] && APP_ROOT="$USER_ROOT"
+BINARY="$APP_ROOT/bin/AnycubicSlicerNext"
+test -x "$BINARY" || { echo "Anycubic Slicer Next fehlt im Systemabbild." >&2; exit 127; }
+test -d "$APP_ROOT/resources" || { echo "Anycubic-Ressourcen fehlen." >&2; exit 126; }
+export LD_LIBRARY_PATH="$APP_ROOT/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export ANYCUBIC_RESOURCES_PATH="$APP_ROOT/resources"
+export GDK_BACKEND="${GDK_BACKEND:-wayland,x11}"
+cd "$APP_ROOT"
+exec "$BINARY" "$@"

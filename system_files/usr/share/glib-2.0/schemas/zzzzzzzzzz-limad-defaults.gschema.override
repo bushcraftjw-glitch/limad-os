@@ -1,0 +1,70 @@
+# LiMaD OS – system-wide GNOME defaults.
+# These are defaults, not locks: every user can still change them in Settings.
+
+[org.gnome.desktop.interface]
+gtk-theme='LiMaD-Dark'
+icon-theme='LiMaD'
+cursor-theme='WhiteSur-cursors'
+color-scheme='prefer-dark'
+font-name='Cantarell 11'
+document-font-name='Cantarell 11'
+monospace-font-name='Source Code Pro 11'
+enable-hot-corners=true
+clock-show-weekday=true
+show-battery-percentage=true
+
+[org.gnome.desktop.wm.preferences]
+button-layout='close,maximize,minimize:'
+titlebar-font='Cantarell Bold 11'
+focus-mode='click'
+
+[org.gnome.mutter]
+center-new-windows=true
+edge-tiling=true
+dynamic-workspaces=true
+
+[org.gnome.shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com', 'dash-to-dock@micxgx.gmail.com', 'blur-my-shell@aunetx', 'logomenu@aryan_k', 'lidrop@limad.local', 'lilink@limad.local']
+favorite-apps=['app.zen_browser.zen.desktop', 'de.limad.Mail.desktop', 'de.limad.Cut.desktop', 'de.limad.Study.desktop', 'de.limad.Notes.desktop', 'de.limad.Drop.desktop', 'de.limad.Link.desktop', 'de.limad.Save.desktop', 'de.limad.WindowsApps.desktop', 'de.limad.Updater.desktop', 'de.limad.AnycubicSlicerNext.desktop', 'us.zoom.Zoom.desktop', 'app.ytmdesktop.ytmdesktop.desktop', 'org.libreoffice.LibreOffice.desktop', 'de.limad.Klang.desktop', 'de.limad.Terminal.desktop', 'io.github.kolunmi.Bazaar.desktop', 'org.gnome.Nautilus.desktop']
+
+[org.gnome.shell.extensions.user-theme]
+name='LiMaD-Dark'
+
+# macOS-like dock: centred at the bottom, floating, no window counters.
+[org.gnome.shell.extensions.dash-to-dock]
+dock-position='BOTTOM'
+extend-height=false
+dock-fixed=true
+autohide=false
+intellihide=false
+intellihide-mode='FOCUS_APPLICATION_WINDOWS'
+show-mounts=false
+show-trash=true
+show-show-apps-button=true
+show-apps-at-top=false
+apply-custom-theme=false
+custom-theme-shrink=true
+transparency-mode='DYNAMIC'
+running-indicator-style='DOTS'
+click-action='minimize-or-previews'
+scroll-action='cycle-windows'
+dash-max-icon-size=48
+custom-background-color=false
+
+[org.gnome.shell.extensions.blur-my-shell]
+sigma=30
+brightness=0.6
+
+[org.gnome.desktop.background]
+color-shading-type='solid'
+primary-color='#241436'
+secondary-color='#241436'
+
+[org.gnome.desktop.screensaver]
+color-shading-type='solid'
+primary-color='#241436'
+
+
+# Logo Menu is applied by the dconf defaults and the first-login migration.
+# Its upstream schema changes key names between releases, so putting those
+# keys in a GLib override would risk GLib rejecting this entire file.

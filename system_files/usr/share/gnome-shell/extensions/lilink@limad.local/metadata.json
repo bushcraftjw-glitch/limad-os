@@ -1,0 +1,7 @@
+{
+  "uuid": "lilink@limad.local",
+  "name": "LiLink Status",
+  "description": "LiLink-Geräte und aktive Bildschirmverbindungen direkt in der GNOME-Systemleiste",
+  "shell-version": ["45", "46", "47", "48", "49", "50"],
+  "version": 1
+}

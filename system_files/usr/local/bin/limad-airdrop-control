@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+[[ ${EUID:-$(id -u)} -eq 0 ]] || { echo "Root-Rechte erforderlich (Aufruf über pkexec)." >&2; exit 77; }
+action=${1:-status}
+iface=${2:-}
+case "$action" in
+  start)
+    [[ -x /usr/libexec/limad-airdrop/backend/owl ]] || { echo "OWL fehlt." >&2; exit 3; }
+    [[ -n "$iface" && -d "/sys/class/net/$iface" ]] || { echo "Ungültige WLAN-Schnittstelle." >&2; exit 4; }
+    if iw dev "$iface" link 2>/dev/null | grep -q 'Connected to'; then
+      echo "Die aktive WLAN-Verbindung wird nicht für OWL übernommen. Bitte einen zweiten kompatiblen WLAN-Adapter verwenden." >&2
+      exit 5
+    fi
+    systemctl start "limad-awdl@${iface}.service"
+    for _ in $(seq 1 40); do
+      if [[ -d /sys/class/net/awdl0 ]]; then
+        systemd-run --quiet --unit="limad-awdl-auto-stop-${iface}" --on-active=10m \
+          /usr/bin/systemctl stop "limad-awdl@${iface}.service" >/dev/null 2>&1 || true
+        exit 0
+      fi
+      sleep .25
+    done
+    systemctl stop "limad-awdl@${iface}.service" || true
+    echo "OWL hat keine awdl0-Schnittstelle erzeugt. Monitor-Modus oder Frame-Injection sind vermutlich nicht nutzbar." >&2
+    exit 6
+    ;;
+  stop)
+    while read -r unit; do
+      [[ -n "$unit" ]] && systemctl stop "$unit" || true
+    done < <(systemctl list-units --type=service --state=active 'limad-awdl@*.service' --no-legend | awk '{print $1}')
+    ;;
+  status)
+    ip -brief link show awdl0 2>/dev/null || true
+    systemctl list-units --type=service 'limad-awdl@*.service' --no-legend || true
+    ;;
+  *)
+    echo "Aufruf: limad-airdrop-control start SCHNITTSTELLE | stop | status" >&2
+    exit 2
+    ;;
+esac

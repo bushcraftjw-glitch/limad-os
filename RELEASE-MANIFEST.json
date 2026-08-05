@@ -1,0 +1,109 @@
+{
+  "product": "LiMaD OS",
+  "version": "2.8.0-rc2-gnome-rc2-build5",
+  "build_revision": "gnome-rc2-build5",
+  "release_name": "LiMaD OS 2.8.0 RC2 Build 5 – Allgemeine Intel-Mac-, Notebook- und PC-Edition mit LiDrop 0.12.0-preview5",
+  "base": "LiMaD OS 2.8.0 RC2 Build 4",
+  "iso_volume_id": "LIMAD_OS_280_RC2",
+  "components": {
+    "limad_study": "6.6.3",
+    "windows_programme": "2.2.6",
+    "limad_mail": "1.8",
+    "lidrop": "0.12.0-preview5",
+    "limad_cut": "1.1.4",
+    "limad_screen_share": "1.0.1",
+    "anycubic_slicer_next": "1.3.96",
+    "lilink": "1.0.0-preview3",
+    "lisave": "1.0.0-preview2",
+    "linotes": "1.0.0-preview2"
+  },
+  "default_browser": {
+    "app_id": "app.zen_browser.zen",
+    "language": "de-DE",
+    "role": "primary"
+  },
+  "default_flatpaks": [
+    "app.zen_browser.zen",
+    "org.mozilla.thunderbird_esr",
+    "us.zoom.Zoom",
+    "app.ytmdesktop.ytmdesktop",
+    "org.libreoffice.LibreOffice",
+    "com.usebottles.bottles",
+    "com.github.wwmm.easyeffects",
+    "io.github.kolunmi.Bazaar"
+  ],
+  "updater_apps": [
+    "de.limad.Cut",
+    "de.limad.Study",
+    "de.limad.Drop",
+    "de.limad.Link",
+    "de.limad.Notes",
+    "de.limad.Save",
+    "de.limad.ScreenShare",
+    "de.limad.AnycubicSlicerNext",
+    "de.limad.WindowsApps"
+  ],
+  "status": "release-candidate",
+  "lilink": {
+    "version": "1.0.0-preview3",
+    "app_id": "de.limad.Link",
+    "service": "limad-link.service",
+    "gnome_extension": "lilink@limad.local",
+    "network_service": "_limad-link._tcp",
+    "port_range": "47888-47898",
+    "receive_folder": "Downloads/LiDrop"
+  },
+  "lidrop": {
+    "version": "0.12.0-preview5",
+    "receive_folder": "Downloads/LiDrop",
+    "nautilus_bookmark": true,
+    "legacy_migration": "~/LiDrop",
+    "os_to_os_transfer": true,
+    "bidirectional_pairing": true,
+    "discovery": "Avahi _limad-drop._tcp",
+    "integrity": "SHA-256 verification"
+  },
+  "lisave": {
+    "version": "1.0.0-preview2",
+    "engine": "restic",
+    "encrypted": true,
+    "incremental": true,
+    "default_schedule": "20:00 daily when target available",
+    "clean_install_detection": true,
+    "program_restore": "download from recorded sources",
+    "target": "second drive or removable media"
+  },
+  "gstreamer": {
+    "mandatory": true,
+    "python_bindings": "python3-gstreamer1",
+    "gtk4_sink": "gstreamer1-plugin-gtk4",
+    "required_element": "gtk4paintablesink"
+  },
+  "linotes": {
+    "version": "1.0.0-preview2",
+    "app_id": "de.limad.Notes",
+    "storage": "~/.local/share/limad-notes",
+    "database": "SQLite",
+    "attachments": "normal files",
+    "apple_notes": "official iCloud access through Zen",
+    "lilink_handoff": true,
+    "lisave": true
+  },
+  "study_watchtower": {
+    "question_typography": "smaller muted text with bold question number",
+    "current_week_article": "dated-text, article-number and week-index resolution",
+    "dark_library": "complete dark surfaces and controls"
+  },
+  "windows_programme": {
+    "version": "2.2.6",
+    "bottles_prefix": "robust Soda/Bottles prefix resolution",
+    "safety": "incomplete environments are not deleted automatically"
+  },
+  "validation": {
+    "offline_tests": "passed in batches",
+    "lidrop_two_service_test": "passed",
+    "lidrop_sha256_transfer": "passed",
+    "github_image_build": "pending",
+    "real_hardware_test": "pending"
+  }
+}

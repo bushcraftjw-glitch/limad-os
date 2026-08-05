@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=LiMaD OS
+Description=LiMaD OS boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/limad
+ScriptFile=/usr/share/plymouth/themes/limad/limad.script

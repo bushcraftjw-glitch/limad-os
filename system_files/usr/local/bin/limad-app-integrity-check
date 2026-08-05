@@ -1,0 +1,21 @@
+#!/usr/bin/python3
+from __future__ import annotations
+import json, os
+from datetime import datetime, timezone
+from pathlib import Path
+APPS={
+ "LiMaD Study": (Path("/usr/share/limad-study"),["VERSION","src/limad_study/__main__.py","web/index.html"]),
+ "LiMaD Cut": (Path("/usr/share/limad-cut"),["VERSION","native_shell.py"]),
+ "LiDrop": (Path("/usr/share/limad-drop"),["VERSION","limad_dropd.py","shell.py","web/app.js","web/styles.css"]),
+}
+state=Path(os.environ.get("XDG_STATE_HOME",Path.home()/".local/state"))/"limad"/"app-integrity.json"
+result={"checkedAt":datetime.now(timezone.utc).isoformat(timespec="seconds"),"ok":True,"apps":{}}
+for name,(root,required) in APPS.items():
+ missing=[item for item in required if not (root/item).is_file()]
+ version=(root/"VERSION").read_text(encoding="utf-8").strip() if (root/"VERSION").is_file() else "unknown"
+ result["apps"][name]={"version":version,"missing":missing,"ok":not missing}
+ result["ok"] &= not missing
+state.parent.mkdir(parents=True,exist_ok=True)
+state.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
+print(json.dumps(result,ensure_ascii=False))
+raise SystemExit(0 if result["ok"] else 1)

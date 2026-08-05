@@ -1,0 +1,31 @@
+LiMaD OS 2.8.0 RC2 Build 1
+Offline-Validierung
+==================
+
+Datum: 2026-08-01
+Basis: LiMaD OS 2.8.0 RC1 Build 9
+
+Ergebnis:
+- 54 von 54 Repository- und Regressionstests erfolgreich ausgeführt.
+- Shell-Syntax einschließlich Bash-3.2-Kompatibilität bestanden.
+- JSON- und Python-Syntax bestanden.
+- GNOME-, Theme-, Icon-, Dock- und First-Login-Prüfungen bestanden.
+- ISO-Metadaten-, EFI-, Anaconda-, Plymouth- und Boot-Konfigurationsprüfungen bestanden.
+- LiMaD Study 6.6.1 integriert und geprüft.
+- Windows-Programme 2.2.5 mit Rezept-Engine, Bottles/System-Wine und LiMaD-Updates-Anbindung geprüft.
+- LiMaD Mail 1.8, Thunderbird-ESR-Installation, Theme-Dateien und Dock-Reihenfolge geprüft.
+- Zoom, YTMDesktop und LibreOffice im First-Login-Flatpak-Weg geprüft.
+- LiDrop-Streamingtest über 16 MiB und Stall-Regression bestanden.
+- LiMaD-App-Updater sowie SHA-256-Prüfung der erzeugten Study- und Windows-Updatepakete bestanden.
+
+Zusätzliche Paketprüfung:
+- LiMaD-Study-6.6.1.limad-update.zip: Manifest, Payload und SHA256SUMS gültig.
+- LiMaD-Windows-Programme-2.2.5.limad-update.zip: Manifest, Payload und SHA256SUMS gültig.
+
+Nicht in dieser Umgebung ausführbar:
+- echter OCI-/Container-Image-Build
+- tatsächlicher bootc-image-builder-ISO-Lauf
+- frische Installation auf realer Hardware
+- Gmail-OAuth-Anmeldung und grafische Endkontrolle nach Neuinstallation
+
+Diese letzten Prüfungen erfolgen über GitHub Actions und anschließend auf dem Zielsystem.

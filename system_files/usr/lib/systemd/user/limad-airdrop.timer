@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh LiDrop AirDrop compatibility state
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=30s
+AccuracySec=5s
+Unit=limad-airdrop.service
+
+[Install]
+WantedBy=timers.target

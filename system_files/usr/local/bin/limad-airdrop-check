@@ -1,0 +1,145 @@
+#!/usr/bin/python3
+from __future__ import annotations
+import json
+import os
+import shutil
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+BACKEND = Path("/usr/libexec/limad-airdrop/backend/opendrop")
+OWL = Path("/usr/libexec/limad-airdrop/backend/owl")
+
+
+def run(args, timeout=5):
+    try:
+        return subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+    except Exception:
+        return None
+
+
+def stamp():
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def iw_interfaces():
+    iw = shutil.which("iw")
+    if not iw:
+        return [], False
+    dev = run([iw, "dev"])
+    listing = run([iw, "list"], timeout=8)
+    monitor = bool(listing and listing.returncode == 0 and "monitor" in listing.stdout.lower())
+    interfaces = []
+    current = None
+    if dev and dev.returncode == 0:
+        for raw in dev.stdout.splitlines():
+            line = raw.strip()
+            if line.startswith("Interface "):
+                current = {"name": line.split(None, 1)[1], "type": "", "connected": False}
+                interfaces.append(current)
+            elif current and line.startswith("type "):
+                current["type"] = line.split(None, 1)[1]
+    for item in interfaces:
+        link = run([iw, "dev", item["name"], "link"])
+        item["connected"] = bool(link and "Connected to" in link.stdout)
+        driver_link = Path("/sys/class/net") / item["name"] / "device/driver"
+        try:
+            item["driver"] = driver_link.resolve().name
+        except OSError:
+            item["driver"] = ""
+    return interfaces, monitor
+
+
+def service_active(scope, unit):
+    args = ["systemctl"]
+    if scope == "user":
+        args.append("--user")
+    result = run([*args, "is-active", unit], timeout=3)
+    return bool(result and result.stdout.strip() == "active")
+
+
+def main():
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", str(Path.home() / ".cache")))
+    runtime.mkdir(parents=True, exist_ok=True)
+    config_path = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "limad-drop/airdrop.json"
+    enabled = False
+    visibility = "off"
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        enabled = bool(config.get("enabled"))
+        visibility = str(config.get("visibility", "off"))
+    except Exception:
+        pass
+
+    interfaces, monitor = iw_interfaces()
+    managed = [item for item in interfaces if item.get("type") in {"managed", ""}]
+    idle = [item for item in managed if not item.get("connected")]
+    selected = idle[0] if idle else None
+    connected = [item for item in managed if item.get("connected")]
+    bluetooth = bool(Path("/sys/class/bluetooth").exists() or shutil.which("bluetoothctl"))
+    owl = OWL.is_file() and os.access(OWL, os.X_OK)
+    backend = BACKEND.is_file() and os.access(BACKEND, os.X_OK)
+    awdl_interface = Path("/sys/class/net/awdl0").exists()
+    receiver_active = service_active("user", "limad-opendrop-receive.service")
+    active = awdl_interface and receiver_active
+    safe_adapter = bool(selected)
+    installed = bool(owl and backend)
+    available = bool(managed and monitor and bluetooth and installed and safe_adapter)
+
+    missing = []
+    if not managed:
+        missing.append("WLAN-Schnittstelle")
+    if not monitor:
+        missing.append("Monitor-Modus")
+    if not bluetooth:
+        missing.append("Bluetooth")
+    if not owl:
+        missing.append("AWDL/OWL")
+    if not backend:
+        missing.append("OpenDrop")
+    if managed and not safe_adapter:
+        missing.append("separate freie WLAN-Schnittstelle")
+
+    if active:
+        message = "AirDrop-Kompatibilitätsmodus ist aktiv."
+    elif available:
+        message = "AirDrop-Kompatibilitätsmodus kann sicher aktiviert werden."
+    elif installed and managed and not safe_adapter:
+        message = "Komponenten installiert, aber die einzige WLAN-Schnittstelle ist verbunden. Für OWL wird ein zweiter kompatibler WLAN-Adapter benötigt."
+    else:
+        message = "Nicht verfügbar: " + ", ".join(missing)
+
+    state = {
+        "available": available,
+        "installed": installed,
+        "active": active,
+        "backend": "ready" if backend else "missing",
+        "backendName": "OpenDrop" if backend else "",
+        "backendPath": str(BACKEND) if backend else "",
+        "wifi": bool(managed),
+        "monitor": monitor,
+        "frameInjection": "untested" if monitor else "unsupported",
+        "bluetooth": bluetooth,
+        "awdl": owl,
+        "owlPath": str(OWL) if owl else "",
+        "interface": selected["name"] if selected else "",
+        "interfaces": interfaces,
+        "connectedInterface": connected[0]["name"] if connected else "",
+        "requiresSecondaryAdapter": bool(managed and not safe_adapter),
+        "driver": selected.get("driver", "") if selected else (connected[0].get("driver", "") if connected else ""),
+        "adapter": selected["name"] if selected else (connected[0]["name"] if connected else ""),
+        "message": message,
+        "checkedAt": stamp(),
+        "devices": [],
+        "enabled": enabled and active,
+        "visibility": visibility if enabled and active else "off",
+        "preview": True,
+    }
+    target = runtime / "limad-airdrop-state.json"
+    target.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(json.dumps(state, ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

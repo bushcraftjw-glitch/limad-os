@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Klangdienst
+Comment=Startet EasyEffects für die direkte LiMaD-Klangregelung
+Exec=/usr/local/bin/limad-easyeffects-service
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=6

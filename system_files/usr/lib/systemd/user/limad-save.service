@@ -1,0 +1,10 @@
+[Unit]
+Description=LiSave automatische Sicherung
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/limad-save-cli scheduled
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

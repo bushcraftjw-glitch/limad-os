@@ -1,0 +1,69 @@
+#!/usr/bin/python3
+from __future__ import annotations
+import datetime
+import os
+import re
+import shutil
+import subprocess
+from pathlib import Path
+
+APPS = {
+    "de.limad.Study": (Path("/usr/share/limad-study"), "src/limad_study/__main__.py"),
+    "de.limad.Cut": (Path("/usr/share/limad-cut"), "native_shell.py"),
+    "de.limad.Drop": (Path("/usr/share/limad-drop"), "limad_dropd.py"),
+}
+DATA_HOME = Path(os.environ.get("XDG_DATA_HOME", Path.home()/".local/share"))
+CACHE_HOME = Path(os.environ.get("XDG_CACHE_HOME", Path.home()/".cache"))
+STATE_HOME = Path(os.environ.get("XDG_STATE_HOME", Path.home()/".local/state"))
+LOG = STATE_HOME/"limad"/"runtime-repair.log"
+
+
+def version(root: Path) -> str:
+    try: return (root/"VERSION").read_text(encoding="utf-8").strip()
+    except OSError: return "0"
+
+
+def key(value: str):
+    value=value.lower().replace("_","-")
+    main, sep, suffix=value.partition("-")
+    core=[int(x) for x in re.findall(r"\d+",main)[:4]]
+    core += [0]*(4-len(core))
+    if not sep: stage,serial=4,0
+    else:
+        m=re.search(r"(alpha|a|beta|b|preview|pre|rc)?[^0-9]*(\d+)?",suffix)
+        label=(m.group(1) if m else None) or "pre"
+        serial=int((m.group(2) if m else "0") or 0)
+        stage={"alpha":0,"a":0,"beta":1,"b":1,"preview":2,"pre":2,"rc":3}.get(label,2)
+    return (*core,stage,serial,value)
+
+
+def note(text: str):
+    LOG.parent.mkdir(parents=True,exist_ok=True)
+    with LOG.open("a",encoding="utf-8") as handle:
+        handle.write(datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")+" "+text+"\n")
+
+
+def main():
+    changed_drop=False
+    stamp=datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    for app_id,(system,required) in APPS.items():
+        user=DATA_HOME/"limad-updater/apps"/app_id/"current"/"payload"
+        if not (user/required).is_file():
+            continue
+        old_version = version(user)
+        if key(old_version) < key(version(system)):
+            current=user.parent
+            backup=current.parent/f"stale-{old_version}-{stamp}"
+            if backup.exists(): shutil.rmtree(backup)
+            current.rename(backup)
+            note(f"{app_id}: altes Benutzer-Payload {old_version} als {backup.name} archiviert; System {version(system)} aktiv")
+            changed_drop |= app_id == "de.limad.Drop"
+    if changed_drop:
+        subprocess.run(["systemctl","--user","stop","limad-drop.service"],check=False,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        for cache in [CACHE_HOME/"limad-drop/webkit", CACHE_HOME/"limad-drop/service-worker", CACHE_HOME/"webkitgtk/de.limad.Drop"]:
+            shutil.rmtree(cache,ignore_errors=True)
+        subprocess.run(["systemctl","--user","start","limad-drop.service"],check=False,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    subprocess.run(["/usr/local/bin/limad-app-integrity-check"],check=False)
+    return 0
+
+if __name__ == "__main__": raise SystemExit(main())

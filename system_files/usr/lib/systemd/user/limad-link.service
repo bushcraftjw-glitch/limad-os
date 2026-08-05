@@ -1,0 +1,24 @@
+[Unit]
+Description=LiLink Geräteverbindung und Continuity
+After=network-online.target limad-session-prepare.service
+Wants=network-online.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+Environment=PYTHONUNBUFFERED=1
+ExecStartPre=/usr/bin/rm -f %t/limad-link.json
+ExecStart=/usr/local/bin/limad-linkd
+Restart=on-failure
+RestartSec=2
+TimeoutStartSec=35
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=false
+RestrictSUIDSGID=true
+LockPersonality=true
+UMask=0077
+
+[Install]
+WantedBy=graphical-session.target

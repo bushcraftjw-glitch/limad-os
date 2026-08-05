@@ -1,0 +1,5 @@
+output/
+*.iso
+__pycache__/
+.DS_Store
+.github-target

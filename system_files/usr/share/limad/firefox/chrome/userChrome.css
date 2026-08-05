@@ -1,0 +1,8 @@
+/* LiMaD OS 2.4 – restrained Firefox chrome. */
+:root { --toolbar-bgcolor:#17111f !important; --toolbar-color:#f7f2ff !important; --lwt-accent-color:#17111f !important; --lwt-text-color:#f7f2ff !important; --tab-selected-bgcolor:#3a2852 !important; --tab-selected-textcolor:#fff !important; --focus-outline-color:#a978ff !important; --button-hover-bgcolor:rgba(169,120,255,.18) !important; --button-active-bgcolor:rgba(169,120,255,.28) !important; }
+#navigator-toolbox,#TabsToolbar,#nav-bar,#PersonalToolbar { background-color:#17111f !important; color:#f7f2ff !important; border-color:rgba(169,120,255,.22) !important; }
+.tabbrowser-tab .tab-background { border-radius:10px 10px 0 0 !important; margin-block:4px 0 !important; }
+.tabbrowser-tab[selected] .tab-background { background:linear-gradient(180deg,#4a3366,#332347) !important; box-shadow:inset 0 1px rgba(255,255,255,.10) !important; }
+#urlbar-background,#searchbar { background:rgba(255,255,255,.075) !important; border:1px solid rgba(169,120,255,.28) !important; border-radius:12px !important; }
+#urlbar[focused] > #urlbar-background { border-color:#a978ff !important; box-shadow:0 0 0 2px rgba(169,120,255,.18) !important; }
+menupopup,panelview { --panel-background:#21182d !important; --panel-color:#f7f2ff !important; --panel-border-color:rgba(169,120,255,.25) !important; }

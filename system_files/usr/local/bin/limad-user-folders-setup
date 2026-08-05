@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+import os
+import shutil
+from pathlib import Path
+from urllib.parse import quote
+
+HOME = Path.home()
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
+
+
+def xdg_dir(key: str, fallback: str) -> Path:
+    path = CONFIG / "user-dirs.dirs"
+    try:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.startswith(f"XDG_{key}_DIR="):
+                raw = line.split("=", 1)[1].strip().strip('"').replace("$HOME", str(HOME))
+                value = Path(os.path.expandvars(os.path.expanduser(raw)))
+                if value.is_absolute():
+                    return value
+    except OSError:
+        pass
+    return HOME / fallback
+
+
+def unique_path(folder: Path, name: str) -> Path:
+    candidate = folder / name
+    if not candidate.exists():
+        return candidate
+    source = Path(name)
+    for index in range(1, 10000):
+        candidate = folder / f"{source.stem} ({index}){source.suffix}"
+        if not candidate.exists():
+            return candidate
+    raise RuntimeError("Kein freier Dateiname verfügbar")
+
+
+def migrate_legacy(destination: Path) -> None:
+    legacy = HOME / "LiDrop"
+    destination.mkdir(parents=True, exist_ok=True)
+    if legacy.is_dir() and not legacy.is_symlink():
+        for item in list(legacy.iterdir()):
+            shutil.move(str(item), str(unique_path(destination, item.name)))
+        try:
+            legacy.rmdir()
+        except OSError:
+            pass
+    if not legacy.exists() and not legacy.is_symlink():
+        try:
+            legacy.symlink_to(destination, target_is_directory=True)
+        except OSError:
+            pass
+
+
+def bookmark_uri(path: Path) -> str:
+    return "file://" + quote(str(path), safe="/")
+
+
+def ensure_bookmark(path: Path, label: str) -> None:
+    uri = bookmark_uri(path)
+    for version in ("gtk-3.0", "gtk-4.0"):
+        bookmark = CONFIG / version / "bookmarks"
+        bookmark.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            lines = [line for line in bookmark.read_text(encoding="utf-8").splitlines() if line.strip()]
+        except OSError:
+            lines = []
+        lines = [line for line in lines if not line.startswith(uri + " ") and line != uri]
+        lines.append(f"{uri} {label}")
+        bookmark.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main() -> int:
+    downloads = xdg_dir("DOWNLOAD", "Downloads")
+    documents = xdg_dir("DOCUMENTS", "Documents")
+    lidrop = downloads / "LiDrop"
+    lilink = documents / "LiLink Sync"
+    migrate_legacy(lidrop)
+    lilink.mkdir(parents=True, exist_ok=True)
+    ensure_bookmark(lidrop, "LiDrop")
+    ensure_bookmark(lilink, "LiLink Sync")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

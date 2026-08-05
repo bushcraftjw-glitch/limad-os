@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -u
+if command -v xdg-terminal-exec >/dev/null 2>&1; then
+  exec xdg-terminal-exec "$@"
+fi
+for terminal in ptyxis kgx gnome-terminal blackbox konsole xterm; do
+  command -v "$terminal" >/dev/null 2>&1 || continue
+  exec "$terminal" "$@"
+done
+command -v notify-send >/dev/null 2>&1 && notify-send -u critical "Terminal nicht verfügbar" "LiMaD konnte keine installierte Terminal-Anwendung finden." || true
+exit 127

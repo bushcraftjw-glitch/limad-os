@@ -1,0 +1,19 @@
+[Desktop Entry]
+Actions=Update;
+Type=Application
+Name=Anycubic Slicer Next
+Comment=3D-Druck-Slicer – integriert in LiMaD OS
+Exec=/usr/bin/anycubicslicernext %F
+TryExec=/usr/bin/anycubicslicernext
+Icon=de.limad.AnycubicSlicerNext
+Terminal=false
+Categories=Graphics;3DGraphics;Engineering;
+MimeType=model/stl;application/vnd.ms-3mfdocument;
+StartupNotify=true
+StartupWMClass=AnycubicSlicerNext
+X-LiMaD-Version=1.3.96
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.AnycubicSlicerNext
+Icon=system-software-update

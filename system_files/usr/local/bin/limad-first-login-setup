@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Applies LiMaD desktop defaults once per user/version. Existing settings
+# remain user-changeable after this one-time migration.
+set -u
+readonly VERSION="2.8.0-rc2-build5"
+readonly STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/limad"
+readonly MARKER="${STATE_DIR}/first-login-${VERSION}.done"
+[[ -e "$MARKER" ]] && exit 0
+mkdir -p "$STATE_DIR"
+GTK_THEME="LiMaD-Dark-purple"
+SHELL_THEME="LiMaD-Dark-purple"
+if [[ -r /usr/share/limad/theme-names.env ]]; then
+  source /usr/share/limad/theme-names.env
+  GTK_THEME="${LIMAD_GTK_THEME_ACTUAL:-$GTK_THEME}"
+  SHELL_THEME="${LIMAD_SHELL_THEME_ACTUAL:-$SHELL_THEME}"
+fi
+have_schema() { gsettings list-schemas 2>/dev/null | grep -Fxq "$1"; }
+set_key() {
+  local schema="$1" key="$2" value="$3"
+  have_schema "$schema" || return 0
+  gsettings writable "$schema" "$key" 2>/dev/null | grep -qx true || return 0
+  gsettings set "$schema" "$key" "$value" 2>/dev/null || true
+}
+enable_extension() {
+  local uuid="$1"
+  command -v gnome-extensions >/dev/null 2>&1 || return 0
+  gnome-extensions info "$uuid" >/dev/null 2>&1 || return 0
+  gnome-extensions enable "$uuid" >/dev/null 2>&1 || true
+}
+ensure_favorites() {
+  have_schema org.gnome.shell || return 0
+  local zen_id="app.zen_browser.zen"
+  if command -v flatpak >/dev/null 2>&1 \
+     && ! flatpak info --user "$zen_id" >/dev/null 2>&1 \
+     && ! flatpak info --system "$zen_id" >/dev/null 2>&1 \
+     && { flatpak info --user io.github.zen_browser.zen >/dev/null 2>&1 \
+          || flatpak info --system io.github.zen_browser.zen >/dev/null 2>&1; }; then
+    zen_id="io.github.zen_browser.zen"
+  fi
+  local desired="['${zen_id}.desktop', 'de.limad.Mail.desktop', 'de.limad.Cut.desktop', 'de.limad.Study.desktop', 'de.limad.Notes.desktop', 'de.limad.Drop.desktop', 'de.limad.Link.desktop', 'de.limad.Save.desktop', 'de.limad.WindowsApps.desktop', 'de.limad.Updater.desktop', 'de.limad.AnycubicSlicerNext.desktop', 'us.zoom.Zoom.desktop', 'app.ytmdesktop.ytmdesktop.desktop', 'org.libreoffice.LibreOffice.desktop', 'de.limad.Klang.desktop', 'de.limad.Terminal.desktop', 'io.github.kolunmi.Bazaar.desktop', 'org.gnome.Nautilus.desktop']"
+  set_key org.gnome.shell favorite-apps "$desired"
+}
+set_key org.gnome.desktop.interface gtk-theme "$GTK_THEME"
+set_key org.gnome.desktop.interface icon-theme 'LiMaD'
+set_key org.gnome.desktop.interface color-scheme 'prefer-dark'
+set_key org.gnome.desktop.background picture-uri 'file:///usr/share/backgrounds/limad/LiMaD-Wallpaper-02-Logo-Zentriert-4K.png'
+set_key org.gnome.desktop.background picture-uri-dark 'file:///usr/share/backgrounds/limad/LiMaD-Wallpaper-02-Logo-Zentriert-4K.png'
+set_key org.gnome.desktop.background picture-options 'zoom'
+set_key org.gnome.desktop.screensaver picture-uri 'file:///usr/share/backgrounds/limad/LiMaD-Wallpaper-02-Logo-Zentriert-4K.png'
+set_key org.gnome.desktop.screensaver picture-options 'zoom'
+set_key org.gnome.shell.extensions.user-theme name "$SHELL_THEME"
+set_key org.gnome.desktop.wm.preferences button-layout 'close,maximize,minimize:'
+set_key org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
+set_key org.gnome.shell.extensions.dash-to-dock dock-fixed true
+set_key org.gnome.shell.extensions.dash-to-dock autohide false
+set_key org.gnome.shell.extensions.dash-to-dock intellihide false
+set_key org.gnome.shell.extensions.dash-to-dock show-mounts false
+set_key org.gnome.shell.extensions.dash-to-dock show-trash true
+set_key org.gnome.shell.extensions.dash-to-dock show-show-apps-button true
+set_key org.gnome.shell.extensions.dash-to-dock show-apps-at-top false
+ensure_favorites
+set_key org.gnome.shell.extensions.logo-menu custom-icon-path '/usr/share/icons/LiMaD/64x64/apps/limad-start.png'
+set_key org.gnome.shell.extensions.logo-menu menu-button-icon-image 0
+set_key org.gnome.shell.extensions.logo-menu symbolic-icon false
+set_key org.gnome.shell.extensions.logo-menu use-custom-icon true
+set_key org.gnome.shell.extensions.logo-menu custom-icon true
+set_key org.gnome.shell.extensions.logo-menu menu-button-icon-size 24
+set_key org.gnome.shell.extensions.logo-menu hide-icon-shadow true
+set_key org.gnome.shell.extensions.logo-menu show-activities-button false
+enable_extension user-theme@gnome-shell-extensions.gcampax.github.com
+enable_extension dash-to-dock@micxgx.gmail.com
+enable_extension blur-my-shell@aunetx
+enable_extension logomenu@aryan_k
+enable_extension lidrop@limad.local
+enable_extension lilink@limad.local
+/usr/local/bin/limad-user-folders-setup >/dev/null 2>&1 || true
+/usr/local/bin/limad-zen-deutsch-setup >/dev/null 2>&1 || true
+nohup /usr/local/bin/limad-lidrop-status-ensure >/dev/null 2>&1 &
+nohup /usr/local/bin/limad-link-status-ensure >/dev/null 2>&1 &
+touch "$MARKER"

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Klang
+GenericName=Equalizer
+Comment=Bass, Mitten und Höhen direkt anpassen
+Exec=/usr/local/bin/limad-klang
+Icon=limad-music
+Terminal=false
+Categories=AudioVideo;Audio;Settings;
+Keywords=Equalizer;Bass;Höhen;Mitten;Klang;EasyEffects;Audio;
+StartupNotify=true
+StartupWMClass=de.limad.Klang

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+[[ ${EUID:-$(id -u)} -eq 0 ]] || { echo "Root-Rechte erforderlich (Aufruf über pkexec)." >&2; exit 77; }
+action=${1:-status}
+range="60000-60010"
+firewall_active() {
+  command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1
+}
+case "$action" in
+  start)
+    if ! firewall_active; then
+      echo "Firewalld ist nicht aktiv; es wurden keine Regeln geändert."
+      exit 0
+    fi
+    firewall-cmd --add-port="${range}/tcp" >/dev/null
+    firewall-cmd --add-port="${range}/udp" >/dev/null
+    systemd-run --quiet --unit=limad-screen-share-firewall-auto-stop --on-active=2h \
+      /usr/local/bin/limad-screen-share-firewall stop >/dev/null 2>&1 || true
+    echo "AirPlay-Ports ${range}/tcp und ${range}/udp sind vorübergehend geöffnet."
+    ;;
+  stop)
+    if firewall_active; then
+      firewall-cmd --remove-port="${range}/tcp" >/dev/null 2>&1 || true
+      firewall-cmd --remove-port="${range}/udp" >/dev/null 2>&1 || true
+    fi
+    systemctl stop limad-screen-share-firewall-auto-stop.timer >/dev/null 2>&1 || true
+    echo "Vorübergehende AirPlay-Firewallregeln wurden entfernt."
+    ;;
+  status)
+    if ! firewall_active; then
+      echo "Firewalld ist nicht aktiv."
+      exit 0
+    fi
+    firewall-cmd --query-port="${range}/tcp" || true
+    firewall-cmd --query-port="${range}/udp" || true
+    ;;
+  *)
+    echo "Aufruf: limad-screen-share-firewall start | stop | status" >&2
+    exit 2
+    ;;
+esac

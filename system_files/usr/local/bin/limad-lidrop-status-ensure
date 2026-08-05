@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -u
+UUID='lidrop@limad.local'
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/limad"
+LOG="$STATE_DIR/lidrop-status.log"
+mkdir -p "$STATE_DIR"
+exec >>"$LOG" 2>&1
+printf '\n[%s] LiDrop status integration check\n' "$(date -Is 2>/dev/null || date)"
+
+notify_failure() {
+  command -v notify-send >/dev/null 2>&1 && notify-send -u critical 'LiDrop-Statussymbol' 'Das Symbol konnte nicht aktiviert werden. Details: ~/.local/state/limad/lidrop-status.log' || true
+}
+
+command -v gnome-extensions >/dev/null 2>&1 || {
+  echo 'gnome-extensions is not available'
+  notify_failure
+  exit 1
+}
+
+for attempt in $(seq 1 12); do
+  info="$(gnome-extensions info "$UUID" 2>&1 || true)"
+  if [[ -z "$info" ]]; then
+    echo "Extension not visible to GNOME Shell yet (attempt $attempt)"
+    sleep 5
+    continue
+  fi
+  printf '%s\n' "$info"
+  if printf '%s\n' "$info" | grep -Eqi 'OUT OF DATE|INCOMPATIBLE|NICHT KOMPATIBEL|VERALTET'; then
+    echo 'LiDrop extension metadata does not support this GNOME Shell version'
+    notify_failure
+    exit 2
+  fi
+  if printf '%s\n' "$info" | grep -Eqi 'ERROR|FEHLER'; then
+    echo 'LiDrop extension is in an error state'
+    notify_failure
+    exit 3
+  fi
+
+  gnome-extensions enable "$UUID" >/dev/null 2>&1 || true
+  sleep 3
+  info="$(gnome-extensions info "$UUID" 2>&1 || true)"
+  printf '%s\n' "$info"
+  if gnome-extensions list --enabled 2>/dev/null | grep -Fxq "$UUID" \
+     && ! printf '%s\n' "$info" | grep -Eqi 'OUT OF DATE|INCOMPATIBLE|ERROR|FEHLER|NICHT KOMPATIBEL|VERALTET'; then
+    echo 'LiDrop status extension is enabled and compatible'
+    exit 0
+  fi
+  echo "LiDrop status extension is not active yet (attempt $attempt)"
+  sleep 5
+done
+
+echo 'LiDrop status extension could not be activated'
+gnome-extensions info "$UUID" 2>&1 || true
+journalctl --user -b --no-pager 2>/dev/null | grep -Ei 'lidrop@limad.local|LiDrop Status|gnome-shell.*extension' | tail -100 || true
+notify_failure
+exit 1

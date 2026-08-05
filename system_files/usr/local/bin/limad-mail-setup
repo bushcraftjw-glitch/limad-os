@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -u
+QUIET="${1:-}"
+STATE="$HOME/.local/share/limad-mail/state"
+mkdir -p "$STATE"
+installed_any_scope() {
+  flatpak info --user "$1" >/dev/null 2>&1 || flatpak info --system "$1" >/dev/null 2>&1
+}
+APP_ID=""
+if command -v flatpak >/dev/null 2>&1; then
+  for id in org.mozilla.thunderbird_esr org.mozilla.thunderbird org.mozilla.Thunderbird; do
+    if installed_any_scope "$id"; then APP_ID="$id"; break; fi
+  done
+fi
+if [[ -n "$APP_ID" ]]; then
+  printf 'flatpak\n' > "$STATE/launcher-mode"
+  printf '%s\n' "$APP_ID" > "$STATE/flatpak-id"
+  flatpak override --user --env=GTK_APPLICATION_PREFER_DARK_THEME=1 "$APP_ID" >/dev/null 2>&1 || true
+  flatpak override --user --unset-env=MOZ_GTK_TITLEBAR_DECORATION --unset-env=GTK_THEME "$APP_ID" >/dev/null 2>&1 || true
+  ROOT="$HOME/.var/app/$APP_ID/.thunderbird"
+  if [[ ! -f "$ROOT/profiles.ini" ]]; then
+    mkdir -p "$ROOT"
+    timeout 30 flatpak run "$APP_ID" -CreateProfile "default-esr" >/dev/null 2>&1 || true
+  fi
+elif command -v thunderbird >/dev/null 2>&1; then
+  printf 'native\n' > "$STATE/launcher-mode"
+  rm -f "$STATE/flatpak-id"
+fi
+THEME_APPLY="${LIMAD_MAIL_THEME_APPLY_HELPER:-/usr/local/bin/limad-mail-theme-apply}"
+THEME_SOURCE="${LIMAD_MAIL_THEME_SOURCE:-/usr/share/limad-mail/theme/limad-mail.css}"
+"$THEME_APPLY" "$THEME_SOURCE" "$QUIET" || true
+if command -v xdg-mime >/dev/null 2>&1; then
+  xdg-mime default de.limad.Mail.desktop x-scheme-handler/mailto >/dev/null 2>&1 || true
+  xdg-mime default de.limad.Mail.desktop message/rfc822 >/dev/null 2>&1 || true
+fi

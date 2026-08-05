@@ -1,0 +1,19 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Windows-Programme
+GenericName=Windows-Installer
+Comment=Windows-Programme automatisch analysieren, installieren, reparieren und verwalten
+Exec=/usr/local/bin/limad-windows-setup
+TryExec=/usr/local/bin/limad-windows-setup
+Icon=de.limad.WindowsApps
+Terminal=false
+StartupNotify=true
+Categories=System;Emulator;
+Keywords=Windows;EXE;MSI;Wine;Bottles;Installer;
+X-LiMaD-Version=2.2.6
+Actions=Update;
+
+[Desktop Action Update]
+Name=Nach Aktualisierung suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.WindowsApps

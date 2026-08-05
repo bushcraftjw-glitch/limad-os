@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+SYSTEM_ROOT="/usr/share/limad-link"
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.Link/current/payload"
+APP_ROOT="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" "app.py")"
+export PYTHONPATH="$APP_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+exec /usr/bin/python3 "$APP_ROOT/app.py" "$@"

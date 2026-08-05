@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+SOURCE="${LIMAD_KLANG_PRESET_SOURCE:-/usr/share/limad-klang/LiMaD Klang.json}"
+[[ -s "$SOURCE" ]] || exit 1
+RESET=0
+[[ "${1:-}" == "--reset" ]] && RESET=1
+APP_ROOT="${HOME}/.var/app/com.github.wwmm.easyeffects"
+TARGETS=(
+  "${APP_ROOT}/data/easyeffects/output/LiMaD Klang.json"
+  "${APP_ROOT}/config/easyeffects/output/LiMaD Klang.json"
+  "${XDG_DATA_HOME:-$HOME/.local/share}/easyeffects/output/LiMaD Klang.json"
+  "${XDG_CONFIG_HOME:-$HOME/.config}/easyeffects/output/LiMaD Klang.json"
+)
+for target in "${TARGETS[@]}"; do
+  mkdir -p "$(dirname "$target")"
+  # LiMaD Klang rewrites its dedicated preset when the sliders move.  Do not
+  # replace those user values on every login; only create missing files or
+  # perform an explicit reset requested by the user/application.
+  if (( RESET == 1 )) || [[ ! -s "$target" ]]; then
+    install -m 0644 "$SOURCE" "$target"
+  fi
+done

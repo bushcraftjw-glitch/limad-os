@@ -1,0 +1,11 @@
+[Unit]
+Description=Clear LiMaD Plymouth restart reminder after the next boot
+ConditionPathExists=/var/lib/limad/plymouth-reboot-required
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/limad-plymouth-reboot-cleanup
+
+[Install]
+WantedBy=multi-user.target

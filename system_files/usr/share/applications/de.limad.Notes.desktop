@@ -1,0 +1,31 @@
+[Desktop Entry]
+Actions=Update;New;Import;
+Type=Application
+Name=LiNotes
+GenericName=Notizen
+Comment=Notizen, Checklisten und Anhänge für LiMaD OS
+Exec=/usr/local/bin/limad-notes %u
+TryExec=/usr/local/bin/limad-notes
+Icon=de.limad.Notes
+Terminal=false
+Categories=Office;Utility;TextEditor;
+Keywords=Notizen;Notes;Post-it;Checkliste;Ordner;Apple;iCloud;
+MimeType=x-scheme-handler/linotes;text/plain;text/markdown;text/html;
+StartupNotify=true
+StartupWMClass=de.limad.Notes
+X-LiMaD-Version=1.0.0-preview2
+
+[Desktop Action New]
+Name=Neue Notiz
+Exec=/usr/local/bin/limad-notes --new
+Icon=document-new
+
+[Desktop Action Import]
+Name=Notizen importieren
+Exec=/usr/local/bin/limad-notes --import
+Icon=document-open
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.Notes
+Icon=system-software-update

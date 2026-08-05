@@ -1,0 +1,78 @@
+LiMaD OS 2.8.0 RC2 Build 5 – Validierungsbericht
+=================================================
+
+Stand: 2026-08-05
+
+Versionen
+---------
+LiMaD OS: 2.8.0-rc2-gnome-rc2-build5
+LiNotes: 1.0.0-preview1
+LiMaD Study: 6.6.2
+LiSave: 1.0.0-preview2
+LiLink: 1.0.0-preview3
+LiDrop: 0.12.0-preview4
+LiMaD Cut: 1.1.4
+Windows-Programme: 2.2.5
+
+Neue Funktionen geprüft
+-----------------------
+- LiNotes-Dateistruktur, Launcher, Desktop-Datei, Metainfo und Iconleiter
+- native SQLite-Datenbank, Standardordner und Notizerstellung
+- Aktualisieren und automatisches Speichern von Notizen
+- Anpinnen, Suche, Papierkorb und Wiederherstellung
+- Dateianhänge mit normal zugänglichen Dateien
+- Import von HTML, RTF und ENEX im simulierten Lauf
+- Exportpfade und Kommandozeilen-/URI-Verarbeitung statisch geprüft
+- LiNotes als Dock-Favorit, First-Login-App und GNOME-Suchergebnis
+- LiNotes in LiMaD Update und Update-Paket-Erzeugung
+- LiNotes in LiSave 1.0.0-preview2
+- LiNotes-Handoff in LiLink 1.0.0-preview3
+- gelbes Post-it-Symbol in 16, 22, 24, 32, 48, 64, 128, 256 und 512 Pixel sowie SVG
+- LiMaD Study 6.6.2: kompakte graue Wachtturm-Fragen
+- kräftige Erkennung der Fragennummern einschließlich Bereichen wie 1–2.
+- Reader-HTML real erzeugt und generiertes JavaScript mit node --check validiert
+- aktuelle-Woche-Auflösung über direkte Dokument-ID und Studienartikelnummer simuliert
+- Fallbacklogik über Datumsbereich, Wochenindex und Fragenbestand statisch geprüft
+
+Gesamttest
+----------
+Die zentrale tests/validate.sh enthält 59 Prüfgruppen.
+
+Der zusammenhängende Sammellauf lief bis tests/test-fix28-dock-override.sh ohne Testfehler und wurde nach rund 20 Minuten ausschließlich durch die feste Laufzeitgrenze der Ausführungsumgebung beendet. Anschließend wurden alle noch offenen Prüfungen einzeln ausgeführt. Danach wurde die gesamte Suite in zwei kontrollierten Testblöcken erneut vollständig abgearbeitet.
+
+Bestandene Bereiche
+-------------------
+- Shell-, Python-, JSON- und Python-Heredoc-Syntax
+- sauberes Projekt ohne Cache- und Buildreste
+- FIX22-Schutzmanifest mit freigegebenen Build-5-Änderungen
+- OCI-/CI-Laufzeit und festgeschriebene Quellen
+- Themes und vollständige LiMaD-Iconprüfung
+- GStreamer und einheitliches Windows-Programme-Symbol
+- LiSave, Zen Deutsch und Downloads/LiDrop
+- LiNotes und Study-Wachtturm-Änderungen
+- GNOME-Standards, Dock und First Login
+- Fensterknöpfe, Firefox-Fallback-Theme und Desktopgestaltung
+- alle LiMaD-App-Starter und App-Updater
+- LiMaD auf TV übertragen
+- LiLink-Dienst, TLS-Kopplung, Berechtigungen und GNOME-Panel
+- Zwei-Geräte-Simulation mit 3.145.745-Byte-Datei, SHA-256 und Widerruf
+- LiDrop-Streaming über 16 MiB
+- Plymouth, Installer, EFI/UEFI, xorriso und ISO-Metadaten
+- Wine, Windows-Programme, Rezept-Engine und Anycubic
+- Repository-Schlüssel, bootc-image-builder und GitHub-Workflow
+- LiMaD Mail, Flatpaks, Audio/LiMaD Klang
+- Study/Cut, Desktop-Starter, Wallpaper und Systemidentität
+
+Nicht als real hardwaregetestet gekennzeichnet
+----------------------------------------------
+- tatsächlicher GitHub-Container- und ISO-Build
+- Installation oder rpm-ostree-Update auf physischer Hardware
+- visuelle Darstellung von LiNotes und Wachtturm-Fragen auf Notebook/iMac
+- reale aktuelle JWPUB mit der Wochenzuordnung
+- Apple-iCloud-Anmeldung und Apple-Notizen-Inhalte
+- Clean-Install-Wiederherstellung eines persönlichen LiSave-Backups
+- reale LiLink-RDP-/Deskflow-Verbindung zwischen Notebook und iMac
+
+Ergebnis
+--------
+Alle offline ausführbaren Prüfungen sind bestanden. Build 5 ist als GitHub-/ISO-Quellpaket freigabebereit. Die genannten Hardware- und GitHub-ISO-Tests bleiben nach dem Upload erforderlich.

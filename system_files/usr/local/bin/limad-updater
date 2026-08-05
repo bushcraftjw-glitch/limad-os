@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+export PYTHONPATH="/usr/share/limad-updater${PYTHONPATH:+:$PYTHONPATH}"
+exec /usr/bin/python3 /usr/share/limad-updater/updater.py "$@"

@@ -1,0 +1,19 @@
+[Desktop Entry]
+Actions=Update;
+Type=Application
+Name=LiMaD Study
+Comment=Offline-Bibliothek, Reader und persönliche Studiendaten
+Exec=/usr/local/bin/limad-study %U
+Icon=de.limad.Study
+Terminal=false
+Categories=Education;
+StartupNotify=true
+StartupWMClass=de.limad.Study
+MimeType=application/x-jwpub;application/x-jwlibrary;application/x-jwlplaylist;
+Keywords=Study;Bible;Library;JWPUB;Notes;
+X-LiMaD-Version=6.6.3
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.Study
+Icon=system-software-update

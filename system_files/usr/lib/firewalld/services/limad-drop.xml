@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>LiDrop</short>
+  <description>Direkte lokale Dateiübertragung zwischen LiMaD OS und gekoppelten Geräten.</description>
+  <port protocol="tcp" port="47777"/>
+</service>

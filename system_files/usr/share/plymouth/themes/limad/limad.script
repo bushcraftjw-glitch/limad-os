@@ -1,0 +1,89 @@
+Window.SetBackgroundTopColor(0.015, 0.008, 0.035);
+Window.SetBackgroundBottomColor(0.015, 0.008, 0.035);
+
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+background_image = Image("boot-splash.png");
+image_width = background_image.GetWidth();
+image_height = background_image.GetHeight();
+scale_x = screen_width / image_width;
+scale_y = screen_height / image_height;
+scale = scale_x;
+if (scale_y > scale_x) scale = scale_y;
+background_image = background_image.Scale(image_width * scale, image_height * scale);
+background_sprite = Sprite(background_image);
+background_sprite.SetX((screen_width - background_image.GetWidth()) / 2);
+background_sprite.SetY((screen_height - background_image.GetHeight()) / 2);
+background_sprite.SetZ(-100);
+
+spinner_00 = Image("spinner-00.png");
+spinner_01 = Image("spinner-01.png");
+spinner_02 = Image("spinner-02.png");
+spinner_03 = Image("spinner-03.png");
+spinner_04 = Image("spinner-04.png");
+spinner_05 = Image("spinner-05.png");
+spinner_06 = Image("spinner-06.png");
+spinner_07 = Image("spinner-07.png");
+spinner_08 = Image("spinner-08.png");
+spinner_09 = Image("spinner-09.png");
+spinner_10 = Image("spinner-10.png");
+spinner_11 = Image("spinner-11.png");
+spinner_sprite = Sprite(spinner_00);
+spinner_sprite.SetX((screen_width - spinner_00.GetWidth()) / 2);
+spinner_sprite.SetY(screen_height * 0.715);
+spinner_sprite.SetZ(50);
+spinner_frame = 0;
+spinner_delay = 0;
+
+fun refresh_callback() {
+    spinner_delay = spinner_delay + 1;
+    if (spinner_delay >= 3) {
+        spinner_delay = 0;
+        spinner_frame = spinner_frame + 1;
+        if (spinner_frame > 11) spinner_frame = 0;
+        if (spinner_frame == 0) spinner_sprite.SetImage(spinner_00);
+        if (spinner_frame == 1) spinner_sprite.SetImage(spinner_01);
+        if (spinner_frame == 2) spinner_sprite.SetImage(spinner_02);
+        if (spinner_frame == 3) spinner_sprite.SetImage(spinner_03);
+        if (spinner_frame == 4) spinner_sprite.SetImage(spinner_04);
+        if (spinner_frame == 5) spinner_sprite.SetImage(spinner_05);
+        if (spinner_frame == 6) spinner_sprite.SetImage(spinner_06);
+        if (spinner_frame == 7) spinner_sprite.SetImage(spinner_07);
+        if (spinner_frame == 8) spinner_sprite.SetImage(spinner_08);
+        if (spinner_frame == 9) spinner_sprite.SetImage(spinner_09);
+        if (spinner_frame == 10) spinner_sprite.SetImage(spinner_10);
+        if (spinner_frame == 11) spinner_sprite.SetImage(spinner_11);
+    }
+}
+
+message_sprite = Sprite();
+message_sprite.SetZ(100);
+
+fun show_message(text) {
+    message_image = Image.Text(text, 1.0, 1.0, 1.0, 1.0, "Sans 14");
+    message_sprite.SetImage(message_image);
+    message_sprite.SetX((screen_width - message_image.GetWidth()) / 2);
+    message_sprite.SetY(screen_height * 0.84);
+}
+
+fun display_normal_callback() {
+    message_sprite.SetImage(Image.Text("", 1.0, 1.0, 1.0, 1.0));
+}
+
+fun display_password_callback(prompt, bullets) {
+    show_message(prompt + " " + bullets);
+}
+
+fun display_question_callback(prompt, entry) {
+    show_message(prompt + " " + entry);
+}
+
+fun display_message_callback(text) {
+    show_message(text);
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayQuestionFunction(display_question_callback);
+Plymouth.SetDisplayMessageFunction(display_message_callback);

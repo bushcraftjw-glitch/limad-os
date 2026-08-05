@@ -1,0 +1,68 @@
+name: Theme-Schnelltest (nur MacTahoe und WhiteSur)
+
+# Baut absichtlich NICHT das ganze Image. Dieser Lauf klont die beiden
+# Design-Quellen, führt die Installationsschritte aus und zeigt anschließend,
+# welche Design- und Icon-Ordner tatsächlich entstanden sind.
+# Dauer: wenige Minuten statt einer halben Stunde.
+
+on:
+  workflow_dispatch:
+    inputs:
+      show_help:
+        description: "Optionsliste der Installer ausgeben"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Design-Schritte prüfen
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Verifizierte OCI-Laufzeit installieren
+        run: |
+          set -Eeuo pipefail
+          sudo bash build_files/install-ci-oci-runtime.sh /usr/local/bin/runc-limad
+          echo "LIMAD_OCI_RUNTIME=/usr/local/bin/runc-limad" >> "$GITHUB_ENV"
+          echo "BUILDAH_RUNTIME=/usr/local/bin/runc-limad" >> "$GITHUB_ENV"
+
+      - name: Speicherplatz freiräumen
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
+          df -h /
+
+      - name: Nur die Design-Schritte bauen
+        run: |
+          set -Eeuo pipefail
+          source build_files/versions.env
+          cat > Containerfile.probe <<PROBE
+          FROM ${BASE_IMAGE_REF}
+          COPY build_files /ctx/build_files
+          RUN bash /ctx/build_files/10-packages.sh \
+           && bash /ctx/build_files/20-mactahoe-gtk.sh \
+           && bash /ctx/build_files/30-whitesur-icons.sh \
+           && echo "=== /usr/share/themes ===" && ls -1 /usr/share/themes \
+           && echo "=== /usr/share/icons ===" && ls -1 /usr/share/icons \
+           && echo "=== ermittelte Namen ===" && cat /usr/share/limad/theme-names.env
+          PROBE
+          podman build --runtime "${LIMAD_OCI_RUNTIME}" -f Containerfile.probe -t limad-theme-probe .
+
+      - name: Ergebnis anzeigen
+        run: |
+          set -Eeuo pipefail
+          echo "### Erzeugte Designs" >> "$GITHUB_STEP_SUMMARY"
+          podman run --rm --runtime "${LIMAD_OCI_RUNTIME}" limad-theme-probe bash -c '
+            echo "GTK/Shell:"; ls -1 /usr/share/themes
+            echo; echo "Icons:"; ls -1 /usr/share/icons
+            echo; echo "Ermittelte Namen:"; cat /usr/share/limad/theme-names.env
+            echo; echo "LiMaD-Icon-Vererbung:"; grep ^Inherits= /usr/share/icons/LiMaD/index.theme
+            echo; echo "GTK3:"; ls /usr/share/themes/*/gtk-3.0/gtk.css 2>/dev/null || echo keine
+            echo "GTK4:"; ls /usr/share/themes/*/gtk-4.0/gtk.css 2>/dev/null || echo keine
+            echo "Shell:"; ls /usr/share/themes/*/gnome-shell/gnome-shell.css 2>/dev/null || echo keine
+            echo "libadwaita in /etc/skel:"; ls /etc/skel/.config/gtk-4.0/ 2>/dev/null || echo keine
+          ' | tee -a "$GITHUB_STEP_SUMMARY"

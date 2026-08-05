@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Updates
+GenericName=App-Aktualisierung
+Comment=LiMaD-App-Updates automatisch finden und ohne Terminal installieren
+Exec=/usr/local/bin/limad-updater %F
+TryExec=/usr/local/bin/limad-updater
+Icon=limad-store
+Terminal=false
+Categories=System;
+Keywords=Update;Aktualisierung;LiMaD;ZIP;Study;LiDrop;Cut;
+StartupNotify=true
+MimeType=application/x-limad-update;

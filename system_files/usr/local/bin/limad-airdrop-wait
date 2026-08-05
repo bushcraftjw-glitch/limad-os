@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+for _ in $(seq 1 50); do
+  [[ -d /sys/class/net/awdl0 ]] && exit 0
+  sleep .2
+done
+echo "awdl0 ist nicht verfügbar." >&2
+exit 1

@@ -1,0 +1,7 @@
+[Unit]
+Description=LiMaD App-Update-ZIPs suchen
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/limad-app-update-check

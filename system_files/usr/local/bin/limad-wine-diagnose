@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -u
+source /usr/share/limad-windows/wine-env.sh
+LOG="${XDG_DATA_HOME:-$HOME/.local/share}/limad-windows/diagnose.log"
+mkdir -p "$(dirname "$LOG")"
+{
+  echo "LiMaD Windows Diagnose $(date -Is)"
+  command -v wine || true
+  wine --version || true
+  echo "DISPLAY=${DISPLAY-} WAYLAND_DISPLAY=${WAYLAND_DISPLAY-} XDG_SESSION_TYPE=${XDG_SESSION_TYPE-}"
+  echo "--- packages ---"
+  rpm -q wine wine-core wine-mono mingw32-wine-gecko mingw64-wine-gecko wine-pulseaudio wine-winefonts winetricks 2>&1 || true
+  echo "--- per-app environments ---"
+  found=0
+  if [[ -d "$LIMAD_WIN_APPS_HOME" ]]; then
+    for directory in "$LIMAD_WIN_APPS_HOME"/*; do
+      [[ -d "$directory" ]] || continue
+      found=1
+      limad_win_use_prefix "$directory/prefix"
+      echo "environment=$(basename "$directory")"
+      echo "WINEPREFIX=$WINEPREFIX"
+      if limad_win_prefix_ready && limad_win_health_check; then echo "health=ok"; else echo "health=failed"; fi
+      [[ -f "$directory/state.json" ]] && sed -n '1,160p' "$directory/state.json"
+    done
+  fi
+  [[ "$found" == 1 ]] || echo "no per-app environments"
+  if [[ -d "$LIMAD_WIN_HOME/prefix" ]]; then
+    limad_win_use_prefix "$LIMAD_WIN_HOME/prefix"
+    echo "--- legacy environment ---"
+    if limad_win_prefix_ready && limad_win_health_check; then echo "health=ok"; else echo "health=failed"; fi
+  fi
+} 2>&1 | tee "$LOG"
+echo "Protokoll: $LOG"

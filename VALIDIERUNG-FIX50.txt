@@ -1,0 +1,69 @@
+LiMaD OS 2.7.0 RC1 FIX50 – Validierungsbericht
+================================================
+
+Basis und Versionsführung
+-------------------------
+- Unveränderte Ausgangsbasis: FIX49
+- SHA-256 der Ausgangs-ZIP:
+  934bf5c2879a81b9405cd0ec60cea1a18487e9a46ae210dc4395a6af163539b7
+- Produktversion: 2.7.0-rc1
+- Buildrevision: gnome42-phase4-fix50
+- First-Login-Marker: 2.7.0-rc1-fix50
+- Flatpak-Marker: default-flatpaks-fix50.done
+- Plymouth-Marker: plymouth-initramfs-fix50.done
+- LiMaD Study: 6.2.2
+- LiMaD Cut: 1.1.4
+
+Umgesetzte Änderungen
+---------------------
+1. LiMaD Study
+- Gesamte mitgelieferte Sprachenliste wird für die Literaturauswahl angeboten.
+- Sprache wird mit Eigenname, englischem Namen, Sprachcode, Schreibrichtung,
+  Gebärdensprache und Katalogverfügbarkeit dargestellt.
+- Die gewählte Literatursprache wird an Dokument und Publikationskarten angezeigt.
+- Das JW/Bibel-LiMaD-Study-Logo ist als einheitliche Quelle für App, Desktop,
+  Anwendungsmenü und Dock in LiMaD- und hicolor-Icon-Themes hinterlegt.
+
+2. LiMaD Cut
+- Die Halbkugel verwendet eine geschlossene, wasserdichte Geometrie mit Bodenfläche.
+- Topologietest: jede ungerichtete Kante kommt exakt zweimal vor.
+- Dadurch erhält die Boolesche Vereinigung eine geschlossene Volumengeometrie.
+
+3. Erster Desktopstart
+- Ein einmaliger Hinweis informiert über Zen Browser, Aerion Mail, Zoom,
+  YouTube Music, EasyEffects und Bazaar während der Zusatzinstallation.
+
+4. Dock
+- Stabiler LiMaD-Terminalstarter ergänzt.
+- Letzte drei Dockpositionen sind:
+  de.limad.Terminal.desktop, io.github.kolunmi.Bazaar.desktop,
+  org.gnome.Nautilus.desktop.
+- Das Terminal steht damit an drittletzter Stelle.
+
+Offline-Validierung der Quellen
+-------------------------------
+- tests/validate.sh vollständig ausgeführt: PASS
+- 47 von 47 Tests: PASS
+- Shell-Syntax: 71 Skripte, Bash-3.2-kompatibel: PASS
+- Clean-Project-Prüfung: PASS
+- Geschützte FIX22-Basis: PASS (306 Dateien, 31 genehmigte Overrides)
+- Build-Wiring und CI-Workflow: PASS
+- Study/Cut/First-Login/Dock-Regressionsprüfung: PASS
+- FIX49 Installer/Plymouth/Klang-Regressionsprüfung: PASS
+- OWL-Zielbuild ohne GoogleTest: PASS
+
+GitHub-Workflows
+----------------
+Die Workflowdateien sind gegenüber FIX49 bytegleich geblieben:
+- .github/workflows/build.yml
+  cf661c57f3ef80d471e382057df0a70c639fe6e2c4186bd3186d8fe75758e82f
+- .github/workflows/theme-probe.yml
+  5936c56ac961d67b1de64489748e34828150bcb7ffb77e7fb148ddfd9bc884b6
+
+Abgrenzung
+----------
+Die Offline-Prüfung bestätigt Paketstruktur, Syntax, Versionen, Icons,
+Geometrie-Topologie, Dock-Reihenfolge und Build-Verkabelung. Der tatsächliche
+GitHub-Container-/ISO-Build sowie der reale WebKit-Boolean-Test von LiMaD Cut
+werden erst beim GitHub-Lauf beziehungsweise auf dem installierten System
+endgültig bestätigt.

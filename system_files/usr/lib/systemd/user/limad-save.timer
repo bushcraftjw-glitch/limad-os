@@ -1,0 +1,11 @@
+[Unit]
+Description=LiSave täglich um 20 Uhr
+
+[Timer]
+OnCalendar=*-*-* 20:00:00
+Persistent=true
+RandomizedDelaySec=10m
+Unit=limad-save.service
+
+[Install]
+WantedBy=timers.target

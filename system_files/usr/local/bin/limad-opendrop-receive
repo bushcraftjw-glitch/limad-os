@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+dir="${XDG_DOWNLOAD_DIR:-$HOME/Downloads}/LiDrop/AirDrop"
+mkdir -p "$dir"
+cd "$dir"
+exec /usr/libexec/limad-airdrop/backend/opendrop receive

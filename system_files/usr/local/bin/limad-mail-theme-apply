@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SOURCE="${1:-/usr/share/limad-mail/theme/limad-mail.css}"
+QUIET="${2:-}"
+[[ -f "$SOURCE" ]] || { echo "Theme-Datei fehlt: $SOURCE" >&2; exit 1; }
+python3 - "$SOURCE" "$QUIET" <<'PY'
+from pathlib import Path
+import configparser
+import os
+import re
+import shutil
+import sys
+import time
+source = Path(sys.argv[1]).expanduser()
+content_source = source.with_name("limad-mail-content.css")
+quiet = sys.argv[2] == "--quiet"
+home = Path.home()
+roots = [
+    home / ".thunderbird",
+    home / ".var/app/org.mozilla.thunderbird_esr/.thunderbird",
+    home / ".var/app/org.mozilla.thunderbird/.thunderbird",
+    home / ".var/app/org.mozilla.Thunderbird/.thunderbird",
+    home / "snap/thunderbird/common/.thunderbird",
+    home / "snap/thunderbird/current/.thunderbird",
+]
+xdg = Path(os.environ.get("XDG_CONFIG_HOME", home / ".config"))
+roots.extend([xdg / "thunderbird", xdg / "mozilla-thunderbird"])
+profiles = []
+seen = set()
+def add_profile(path: Path):
+    try:
+        path = path.expanduser().resolve()
+    except Exception:
+        path = path.expanduser()
+    key = str(path)
+    if key in seen or not path.is_dir():
+        return
+    if not any((path / name).exists() for name in ("prefs.js", "times.json", "compatibility.ini", "places.sqlite", "ImapMail", "Mail")):
+        return
+    seen.add(key)
+    profiles.append(path)
+for root in roots:
+    if not root.is_dir():
+        continue
+    ini = root / "profiles.ini"
+    if ini.exists():
+        cfg = configparser.RawConfigParser()
+        try:
+            cfg.read(ini, encoding="utf-8")
+            for sec in cfg.sections():
+                if not sec.lower().startswith("profile"):
+                    continue
+                raw = cfg.get(sec, "Path", fallback="").strip()
+                if not raw:
+                    continue
+                relative = cfg.get(sec, "IsRelative", fallback="1").strip() != "0"
+                add_profile(root / raw if relative else Path(raw))
+        except Exception:
+            pass
+    for child in root.iterdir():
+        if child.is_dir():
+            add_profile(child)
+if not profiles:
+    print("Kein bestehendes Thunderbird-Profil gefunden.", file=sys.stderr)
+    sys.exit(2)
+prefs = {
+    "toolkit.legacyUserProfileCustomizations.stylesheets": "true",
+    "ui.systemUsesDarkTheme": "1",
+    "browser.theme.unified-color-scheme": "true",
+    "browser.theme.toolbar-theme": "0",
+    "browser.theme.content-theme": "0",
+    "mail.tabs.drawInTitlebar": "true",
+    "mail.tabs.autoHide": "false",
+    "browser.tabs.inTitlebar": "1",
+}
+start_marker = "// >>> LiMaD Mail managed preferences >>>"
+end_marker = "// <<< LiMaD Mail managed preferences <<<"
+managed_lines = [start_marker]
+for key, value in prefs.items():
+    rendered = value if value in {"true", "false"} or value.isdigit() else repr(value)
+    managed_lines.append(f'user_pref("{key}", {rendered});')
+managed_lines.append(end_marker)
+managed_block = "\n".join(managed_lines) + "\n"
+for profile in profiles:
+    chrome = profile / "chrome"
+    chrome.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, chrome / "limad-mail.css")
+    if content_source.exists():
+        shutil.copy2(content_source, chrome / "limad-mail-content.css")
+    user_chrome = chrome / "userChrome.css"
+    preserved_chrome = chrome / "userChrome.before-limad.css"
+    old = user_chrome.read_text(encoding="utf-8", errors="ignore") if user_chrome.exists() else ""
+    old_is_limad = "limad-mail.css" in old or "LiMaD Mail" in old
+    if old.strip() and not old_is_limad and not preserved_chrome.exists():
+        shutil.copy2(user_chrome, preserved_chrome)
+    imports = []
+    if preserved_chrome.exists():
+        imports.append('@import url("userChrome.before-limad.css");')
+    imports.append('@import url("limad-mail.css");')
+    user_chrome.write_text("\n".join(imports) + "\n", encoding="utf-8")
+    if content_source.exists():
+        user_content = chrome / "userContent.css"
+        preserved_content = chrome / "userContent.before-limad.css"
+        old_content = user_content.read_text(encoding="utf-8", errors="ignore") if user_content.exists() else ""
+        old_content_is_limad = "limad-mail-content.css" in old_content or "LiMaD Mail" in old_content
+        if old_content.strip() and not old_content_is_limad and not preserved_content.exists():
+            shutil.copy2(user_content, preserved_content)
+        content_imports = []
+        if preserved_content.exists():
+            content_imports.append('@import url("userContent.before-limad.css");')
+        content_imports.append('@import url("limad-mail-content.css");')
+        user_content.write_text("\n".join(content_imports) + "\n", encoding="utf-8")
+    user_js = profile / "user.js"
+    existing = user_js.read_text(encoding="utf-8", errors="ignore") if user_js.exists() else ""
+    existing = re.sub(re.escape(start_marker) + r".*?" + re.escape(end_marker) + r"\s*", "", existing, flags=re.S)
+    user_js.write_text(existing.rstrip() + ("\n\n" if existing.strip() else "") + managed_block, encoding="utf-8")
+    prefs_js = profile / "prefs.js"
+    if prefs_js.exists():
+        text = prefs_js.read_text(encoding="utf-8", errors="ignore")
+        for key, value in prefs.items():
+            rendered = value if value in {"true", "false"} or value.isdigit() else repr(value)
+            pattern = re.compile(r'^user_pref\("' + re.escape(key) + r'",.*?\);\s*$', re.M)
+            text = pattern.sub("", text)
+            text = text.rstrip() + f'\nuser_pref("{key}", {rendered});\n'
+        prefs_js.write_text(text, encoding="utf-8")
+    (profile / ".limad-mail-theme-active").write_text(f"LiMaD Mail Theme 1.8\n{int(time.time())}\n", encoding="utf-8")
+    if not quiet:
+        print(f"Theme installiert: {profile}")
+PY

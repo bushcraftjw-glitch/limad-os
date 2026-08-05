@@ -1,0 +1,24 @@
+LiMaD OS 2.7.0 RC1 – FIX49 Validierungsplan
+
+Aktive Versionsmarker:
+- gnome42-phase4-fix49
+- 2.7.0-rc1-fix49
+- default-flatpaks-fix49.done
+- plymouth-initramfs-fix49.done
+
+Pflichtprüfungen:
+1. tests/validate.sh vollständig auf einer frisch entpackten Kopie.
+2. Zweite Runde mit LIMAD_TEST_FORCE_NO_PIL=1 für den macOS-Fallback.
+3. Keine __pycache__-, .pyc-, .pyo-, node_modules- oder .cache-Reste.
+4. ZIP-Integrität mit unzip -t.
+5. EasyEffects-Versionserkennung mit simuliertem Flatpak 8.2.8.
+6. Unix-Socket-Suche am Flatpak-Unterpfad.
+7. Preset-Erzeugung für Bass, Mitten, Höhen und Headroom.
+8. Preset-Installer darf bestehende LiMaD-Reglerwerte nicht überschreiben.
+9. Plymouth verwendet ausschließlich rpm-ostree initramfs --enable.
+10. Kein dracut --force und keine Repository-Löschfunktion.
+
+Laufzeittests, die erst am installierten System möglich sind:
+- sichtbarer LiMaD-Splash nach automatisch vorbereitetem Deployment und Neustart
+- direkte EasyEffects-Socket-Steuerung oder automatischer Preset-Fallback
+- tatsächlicher GitHub-Container- und ISO-Build

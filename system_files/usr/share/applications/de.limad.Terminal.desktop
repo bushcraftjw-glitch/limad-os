@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Terminal
+Name[de]=Terminal
+Comment=Terminal öffnen
+Exec=/usr/local/bin/limad-terminal
+Icon=de.limad.Terminal
+Terminal=false
+Categories=System;TerminalEmulator;
+Keywords=Terminal;Shell;Command;Befehl;Konsole;
+StartupNotify=true
+X-LiMaD-Version=2.8.0-rc2-build5

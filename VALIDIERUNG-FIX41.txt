@@ -1,0 +1,8 @@
+LiMaD OS 2.7.0 RC1 – FIX41 Validierung
+
+Aktive Versionsmarker sind konsistent:
+- gnome42-phase4-fix41
+- 2.7.0-rc1-fix41
+- default-flatpaks-fix41.done
+
+Das fertig gepackte ZIP wurde erneut entpackt und mit tests/validate.sh geprüft.

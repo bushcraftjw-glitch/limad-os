@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -u
+UUID='lilink@limad.local'
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/limad"
+LOG="$STATE_DIR/lilink-status.log"
+mkdir -p "$STATE_DIR"
+exec >>"$LOG" 2>&1
+printf '\n[%s] LiLink status integration check\n' "$(date -Is 2>/dev/null || date)"
+command -v gnome-extensions >/dev/null 2>&1 || exit 1
+for attempt in $(seq 1 12); do
+  info="$(gnome-extensions info "$UUID" 2>&1 || true)"
+  if [[ -n "$info" ]] && ! printf '%s\n' "$info" | grep -Eqi 'OUT OF DATE|INCOMPATIBLE|ERROR|FEHLER|NICHT KOMPATIBEL|VERALTET'; then
+    gnome-extensions enable "$UUID" >/dev/null 2>&1 || true
+    sleep 2
+    gnome-extensions list --enabled 2>/dev/null | grep -Fxq "$UUID" && exit 0
+  fi
+  sleep 5
+done
+command -v notify-send >/dev/null 2>&1 && notify-send -u critical 'LiLink-Statussymbol' 'Das Symbol konnte nicht aktiviert werden. Details: ~/.local/state/limad/lilink-status.log' || true
+exit 1

@@ -1,0 +1,11 @@
+[Unit]
+Description=LiMaD App-Updates regelmäßig prüfen
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=6h
+Persistent=true
+AccuracySec=15min
+
+[Install]
+WantedBy=timers.target

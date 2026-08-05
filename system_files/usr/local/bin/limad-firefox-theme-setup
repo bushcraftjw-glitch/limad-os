@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""Install the LiMaD Firefox chrome into native and Flatpak profiles."""
+from __future__ import annotations
+
+import configparser
+import os
+import shutil
+from pathlib import Path
+
+HOME = Path.home()
+SOURCE = Path("/usr/share/limad/firefox/chrome")
+PREFS = """// BEGIN LiMaD OS managed Firefox preferences
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+user_pref("browser.theme.content-theme", 0);
+user_pref("browser.theme.toolbar-theme", 0);
+user_pref("ui.systemUsesDarkTheme", 1);
+user_pref("browser.tabs.inTitlebar", 1);
+// END LiMaD OS managed Firefox preferences
+"""
+BEGIN = "// BEGIN LiMaD OS managed Firefox preferences"
+END = "// END LiMaD OS managed Firefox preferences"
+
+
+def profile_paths(root: Path) -> list[Path]:
+    root.mkdir(parents=True, exist_ok=True)
+    ini = root / "profiles.ini"
+    if not ini.exists():
+        rel = "Profiles/limad.default-release"
+        ini.write_text(
+            "[General]\n"
+            "StartWithLastProfile=1\n"
+            "Version=2\n\n"
+            "[Profile0]\n"
+            "Name=default-release\n"
+            "IsRelative=1\n"
+            f"Path={rel}\n"
+            "Default=1\n",
+            encoding="utf-8",
+        )
+
+    parser = configparser.RawConfigParser()
+    try:
+        parser.read(ini, encoding="utf-8")
+    except configparser.Error:
+        return []
+
+    found: list[Path] = []
+    for section in parser.sections():
+        if not section.startswith("Profile") or not parser.has_option(section, "Path"):
+            continue
+        raw = parser.get(section, "Path")
+        relative = parser.get(section, "IsRelative", fallback="1") == "1"
+        profile = (root / raw) if relative else Path(os.path.expanduser(raw))
+        profile.mkdir(parents=True, exist_ok=True)
+        found.append(profile)
+    return found
+
+
+def update_user_js(profile: Path) -> None:
+    path = profile / "user.js"
+    old = path.read_text(encoding="utf-8", errors="replace") if path.exists() else ""
+    while BEGIN in old and END in old:
+        start = old.index(BEGIN)
+        finish = old.index(END, start) + len(END)
+        old = (old[:start] + old[finish:]).strip()
+    path.write_text((old + "\n\n" if old else "") + PREFS, encoding="utf-8")
+
+
+def install(profile: Path) -> None:
+    chrome = profile / "chrome"
+    chrome.mkdir(parents=True, exist_ok=True)
+    for name in ("userChrome.css", "userContent.css"):
+        shutil.copy2(SOURCE / name, chrome / name)
+    update_user_js(profile)
+
+
+def main() -> int:
+    if not SOURCE.is_dir():
+        return 0
+    roots = [
+        HOME / ".mozilla/firefox",
+        HOME / ".var/app/org.mozilla.firefox/.mozilla/firefox",
+    ]
+    for root in roots:
+        for profile in profile_paths(root):
+            install(profile)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

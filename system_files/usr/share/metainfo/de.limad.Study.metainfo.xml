@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.limad.Study</id>
+  <name>LiMaD Study</name>
+  <summary>Lokale Studienbibliothek für Linux</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>LiMaD Study verwaltet JWPUB-Publikationen, lokale Covers, Volltextsuche, Zusammenkünfte und persönliche Studiendaten aus JWL-Library-Backups.</p>
+    <p>Importierte Inhalte bleiben lokal und können offline gelesen werden.</p>
+  </description>
+  <launchable type="desktop-id">de.limad.Study.desktop</launchable>
+  <provides><binary>limad-study</binary></provides>
+  <releases><release version="6.6.3" date="2026-08-05"><description><p>Korrekturen für Wochenzuordnung, Bibliothek und dunkles Design.</p></description></release></releases>
+  <content_rating type="oars-1.1"/>
+</component>

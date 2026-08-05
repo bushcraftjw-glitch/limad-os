@@ -1,0 +1,19 @@
+[Unit]
+Description=LiMaD App-Laufzeitprüfung nach Systemaktualisierung
+After=graphical-session-pre.target
+Before=limad-drop.service
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/limad-app-runtime-repair
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=-%h/.local/share/limad-updater -%h/.local/state/limad -%h/.cache/limad-drop -%h/.cache/webkitgtk
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=graphical-session.target

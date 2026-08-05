@@ -1,0 +1,19 @@
+[Desktop Entry]
+Actions=Update;
+Type=Application
+Name=LiMaD auf TV übertragen
+GenericName=Auf Fernseher übertragen
+Comment=Bild und Ton an Google TV, Samsung-Fernseher oder Apple TV übertragen
+Exec=/usr/local/bin/limad-screen-share
+Icon=limad-screen-share
+Terminal=false
+Categories=Network;AudioVideo;Utility;
+StartupNotify=true
+StartupWMClass=de.limad.ScreenShare
+Keywords=AirPlay;Apple TV;Chromecast;Google TV;Miracast;Samsung;Bildschirm;Spiegeln;
+X-LiMaD-Version=1.0.1
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.ScreenShare
+Icon=system-software-update

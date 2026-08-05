@@ -1,0 +1,11 @@
+LiMaD OS 2.7.0 RC1 – FIX43 Validierung
+
+Aktive Marker:
+- gnome42-phase4-fix43
+- 2.7.0-rc1-fix43
+- default-flatpaks-fix43.done
+
+Schutz:
+- automatische Entfernung erzeugter Python-Caches vor der Prüfung
+- OWL target-only build
+- Prüfung des fertig gepackten ZIPs nach erneutem Entpacken

@@ -1,0 +1,38 @@
+LiMaD OS 2.7.0 RC1 – FIX47 Validierungsplan
+
+Aktive Marker:
+- gnome42-phase4-fix47
+- 2.7.0-rc1-fix47
+- default-flatpaks-fix47.done
+- plymouth-initramfs-fix47.done
+
+Geprüfte Reparaturen:
+- echte Flatpak-Versionsauswertung für EasyEffects
+- ausführbarer Fake-Flatpak-Test mit Version 8.2.8
+- EasyEffects-Socket-, Set- und Get-Property-Verkabelung
+- Anaconda-WebUI-Branding für limad, bazzite und fedora
+- GTK-Fallback mit offiziellen Anaconda-Klassennamen
+- keine Ersetzung von Anacondas vollständigem Basis-CSS
+- product.img-Pfadaudit vor dem ISO-Umbau
+- rpm-ostree-konforme Plymouth-Aktivierung ohne dracut --force
+- sichtbarer Neustarthinweis und anschließende Bereinigung
+- GitHub-Schreibrechtprüfung vor Commit/Push
+- kein automatisches Löschen eines GitHub-Repositorys
+
+Pflichtprüfungen vor Freigabe:
+1. tests/validate.sh mit Pillow
+2. tests/validate.sh mit LIMAD_TEST_FORCE_NO_PIL=1
+3. Shell-, Python-, JSON- und Cache-Audit
+4. Workflow-Hashvergleich mit FIX46
+5. fertiges ZIP entpacken und tests/validate.sh aus drei frischen Kopien starten
+6. ZIP-Integrität und SHA-256
+
+Grenze der Offline-Prüfung:
+Der tatsächliche Container-/ISO-Build auf GitHub sowie Plymouth, Anaconda und
+EasyEffects auf echter Hardware können erst im externen Workflow und danach auf
+dem Testsystem abschließend bestätigt werden.
+
+Vor dem Packen ausgeführt:
+- vollständige Offline-Validierung mit Pillow: PASS
+- vollständige Offline-Validierung im erzwungenen Ohne-Pillow-Modus: PASS
+- Cache-/Bytecode-Rückstände danach: 0

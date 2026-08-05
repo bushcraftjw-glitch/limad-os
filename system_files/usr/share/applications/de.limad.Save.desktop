@@ -1,0 +1,20 @@
+[Desktop Entry]
+Actions=Update;
+Type=Application
+Name=LiSave
+GenericName=LiMaD-Sicherung
+Comment=Persönlichen LiMaD-Stand verschlüsselt sichern und wiederherstellen
+Exec=/usr/local/bin/limad-save
+TryExec=/usr/local/bin/limad-save
+Icon=de.limad.Save
+Terminal=false
+Categories=System;Utility;Archiving;
+Keywords=Backup;Sicherung;Wiederherstellung;USB;Zen;Study;Mail;
+StartupNotify=true
+StartupWMClass=de.limad.Save
+X-LiMaD-Version=1.0.0-preview2
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.Save
+Icon=system-software-update

@@ -1,0 +1,11 @@
+[Unit]
+Description=LiDrop AirDrop compatibility preview probe
+After=network-online.target bluetooth.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/limad-airdrop-check
+
+[Install]
+WantedBy=default.target

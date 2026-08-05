@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+SYSTEM_ROOT="/usr/share/limad-windows"
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.WindowsApps/current/payload"
+APP_ROOT="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" "installer.py")"
+[[ -r "$APP_ROOT/wine-env.sh" ]] && source "$APP_ROOT/wine-env.sh"
+mkdir -p "${LIMAD_WIN_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/limad-windows}"
+exec /usr/bin/python3 "$APP_ROOT/installer.py" "$@"

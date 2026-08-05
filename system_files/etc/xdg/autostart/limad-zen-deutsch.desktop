@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Zen Browser auf Deutsch einrichten
+Exec=/usr/local/bin/limad-zen-deutsch-setup
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

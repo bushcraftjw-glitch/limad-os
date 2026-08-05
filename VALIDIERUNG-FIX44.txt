@@ -1,0 +1,18 @@
+LiMaD OS 2.7.0 RC1 – FIX44 Validierungsplan
+
+Aktive Marker:
+- gnome42-phase4-fix44
+- 2.7.0-rc1-fix44
+- default-flatpaks-fix44.done
+- plymouth-initramfs-fix44.done
+
+Gezielte Regressionen:
+- Installer-Assets werden aus dem Original-LiMaD-Logo erzeugt.
+- Anaconda WebUI und GTK-Fallback erhalten LiMaD-Stylesheets.
+- rpm-ostree kontrolliert die initramfs-Erzeugung; kein ausführbarer dracut --force-Aufruf.
+- EasyEffects-Presetpfade, Version 8.2.8, lokaler Socket und Equalizer-Befehle werden geprüft.
+- Der OWL target-only Build aus FIX43 bleibt aktiv.
+- GitHub-Workflowdateien bleiben bytegleich zu FIX43.
+
+Das finale Prüfergebnis der drei frischen ZIP-Entpackungen liegt zusätzlich in
+FIX44-3X-VALIDIERUNG.txt neben dem Downloadpaket.

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+SYSTEM_ROOT="/usr/share/limad-windows"
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.WindowsApps/current/payload"
+APP_ROOT="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" "installer.py")"
+source "$APP_ROOT/wine-env.sh"
+notify_error() {
+  if command -v zenity >/dev/null 2>&1; then
+    zenity --error --title="Windows-Programme" --text="$1" --icon-name=de.limad.WindowsApps 2>/dev/null || true
+  fi
+  echo "$1" >&2
+}
+PREFIX=""
+TARGET=""
+ARGS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --prefix) PREFIX="${2:-}"; shift 2 ;;
+    --exe) TARGET="${2:-}"; shift 2 ;;
+    --) shift; ARGS+=("$@"); break ;;
+    *)
+      if [[ -z "$TARGET" ]]; then TARGET="$1"; else ARGS+=("$1"); fi
+      shift
+      ;;
+  esac
+done
+if [[ -z "$TARGET" ]]; then exec /usr/local/bin/limad-windows-setup; fi
+if [[ "$TARGET" == file://* ]]; then
+  TARGET="$(python3 -c 'import sys,urllib.parse;print(urllib.parse.unquote(urllib.parse.urlparse(sys.argv[1]).path))' "$TARGET")"
+fi
+if [[ ! -f "$TARGET" ]]; then notify_error "Datei nicht gefunden: $TARGET"; exit 2; fi
+case "${TARGET,,}" in
+  *.exe|*.msi)
+    if [[ -z "$PREFIX" ]]; then exec /usr/local/bin/limad-windows-setup "$TARGET"; fi
+    ;;
+esac
+limad_win_use_prefix "$PREFIX"
+if ! limad_win_have_wine; then notify_error "Wine ist in diesem Systemabbild nicht enthalten."; exit 127; fi
+if ! limad_win_init_prefix; then notify_error "Die zugehörige Windows-Umgebung konnte nicht gestartet werden."; exit 3; fi
+cd "$(dirname "$TARGET")"
+case "${TARGET,,}" in
+  *.msi) exec wine msiexec /i "$TARGET" "${ARGS[@]}" ;;
+  *.bat|*.cmd) exec wine cmd /c "$TARGET" "${ARGS[@]}" ;;
+  *) exec wine "$TARGET" "${ARGS[@]}" ;;
+esac

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>LiLink</short>
+  <description>TLS-gesicherte Geräteerkennung, Kopplung, Dateiübergabe und Continuity zwischen LiMaD-OS-Geräten.</description>
+  <port protocol="tcp" port="47888-47898"/>
+</service>

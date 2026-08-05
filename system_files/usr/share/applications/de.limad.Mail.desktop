@@ -1,0 +1,23 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=LiMaD Mail
+GenericName=E-Mail und Kalender
+Comment=E-Mails, Kalender und Kontakte mit Thunderbird verwalten
+Exec=/usr/local/bin/limad-mail %U
+TryExec=/usr/local/bin/limad-mail
+Icon=de.limad.Mail
+Terminal=false
+DBusActivatable=false
+Categories=Network;Email;
+MimeType=message/rfc822;x-scheme-handler/mailto;
+StartupNotify=true
+StartupWMClass=thunderbird-esr
+X-GNOME-UsesNotifications=true
+X-GNOME-SingleWindow=true
+X-LiMaD-Version=1.8
+Actions=Compose;
+
+[Desktop Action Compose]
+Name=Neue Nachricht
+Exec=/usr/local/bin/limad-mail -compose

@@ -1,0 +1,18 @@
+LiMaD OS 2.7.0 RC1 – FIX46 Validierungsplan
+
+Aktive Marker:
+- gnome42-phase4-fix46
+- 2.7.0-rc1-fix46
+- default-flatpaks-fix46.done
+- plymouth-initramfs-fix46.done
+
+GitHub-Ziel:
+- https://github.com/bushcraftjw-glitch/limad-os.git
+
+Pflichtprüfungen:
+- tests/validate.sh
+- beide Startskripte mit bushcraftjw-glitch/limad-os
+- keine alten aktiven petravonstiller-spec-Defaults
+- unveränderte Workflowdateien
+- keine Cache-/Bytecode-Reste
+- ZIP-Integrität und dreifacher Test aus frisch entpackten Kopien

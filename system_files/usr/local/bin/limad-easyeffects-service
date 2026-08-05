@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -u
+readonly APP_ID=com.github.wwmm.easyeffects
+readonly RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+flatpak info "$APP_ID" >/dev/null 2>&1 || exit 0
+/usr/local/bin/limad-install-klang-preset >/dev/null 2>&1 || true
+find "$RUNTIME" -maxdepth 5 -type s -name EasyEffectsServer -print -quit 2>/dev/null | grep -q . && exit 0
+# EasyEffects 8 is Qt/Kirigami. The old GTK background-service switch no
+# longer starts the current service reliably. --hide-window is
+# the supported background start; -w is retained as a compatibility fallback.
+flatpak run "$APP_ID" --hide-window >/dev/null 2>&1 || \
+  exec flatpak run "$APP_ID" -w

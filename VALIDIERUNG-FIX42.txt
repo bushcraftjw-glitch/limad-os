@@ -1,0 +1,11 @@
+LiMaD OS 2.7.0 RC1 – FIX42 Validierung
+
+Aktive Marker:
+- gnome42-phase4-fix42
+- 2.7.0-rc1-fix42
+- default-flatpaks-fix42.done
+
+OWL-Build:
+- Konfiguration mit CMake-Policy >= 3.5
+- BUILD_TESTING=OFF
+- gezielter Build des Targets owl

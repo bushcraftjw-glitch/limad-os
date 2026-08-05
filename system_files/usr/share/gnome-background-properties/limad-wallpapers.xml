@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>LiMaD – Symbol links</name>
+    <name xml:lang="en">LiMaD – Logo left</name>
+    <filename>/usr/share/backgrounds/limad/LiMaD-Wallpaper-01-Logo-Links-4K.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#241436</pcolor>
+    <scolor>#241436</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>LiMaD – Symbol zentriert</name>
+    <name xml:lang="en">LiMaD – Logo centred</name>
+    <filename>/usr/share/backgrounds/limad/LiMaD-Wallpaper-02-Logo-Zentriert-4K.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#241436</pcolor>
+    <scolor>#241436</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>LiMaD – Wellen und Emblem</name>
+    <name xml:lang="en">LiMaD – Waves and emblem</name>
+    <filename>/usr/share/backgrounds/limad/LiMaD-Wallpaper-03-Wellen-Emblem-4K.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#241436</pcolor>
+    <scolor>#241436</scolor>
+  </wallpaper>
+</wallpapers>

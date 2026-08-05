@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Benutzerordner vorbereiten
+Exec=/usr/local/bin/limad-user-folders-setup
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

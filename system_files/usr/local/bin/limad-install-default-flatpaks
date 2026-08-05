@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/limad"
+STATE_FILE="$STATE_DIR/default-flatpaks-rc2-build5.done"
+mkdir -p "$STATE_DIR"
+[[ -f "$STATE_FILE" ]] && exit 0
+command -v notify-send >/dev/null 2>&1 && notify-send -u low "LiMaD richtet zusätzliche Programme ein" "Zen Browser auf Deutsch, LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, Klang und Bazaar werden vorbereitet." || true
+FLATHUB_URL="https://dl.flathub.org/repo/flathub.flatpakrepo"
+MAIL_SETUP="${LIMAD_MAIL_SETUP_HELPER:-/usr/local/bin/limad-mail-setup}"
+KLANG_PRESET_HELPER="${LIMAD_KLANG_PRESET_HELPER:-/usr/local/bin/limad-install-klang-preset}"
+ZEN_SETUP_HELPER="${LIMAD_ZEN_SETUP_HELPER:-/usr/local/bin/limad-zen-deutsch-setup}"
+if ! flatpak remotes --user --columns=name 2>/dev/null | grep -Fxq flathub; then
+  flatpak remote-add --user --if-not-exists flathub "$FLATHUB_URL" || exit 1
+fi
+installed_any_scope() {
+  flatpak info --user "$1" >/dev/null 2>&1 || flatpak info --system "$1" >/dev/null 2>&1
+}
+install_user_app() {
+  local app_id="$1"
+  if installed_any_scope "$app_id"; then echo "already installed: $app_id"; return 0; fi
+  echo "installing: $app_id"
+  flatpak install --user --noninteractive -y flathub "$app_id"
+}
+ZEN_ID="app.zen_browser.zen"
+if installed_any_scope "$ZEN_ID"; then :
+elif installed_any_scope "io.github.zen_browser.zen"; then ZEN_ID="io.github.zen_browser.zen"
+elif ! install_user_app "$ZEN_ID"; then ZEN_ID="io.github.zen_browser.zen"; install_user_app "$ZEN_ID" || exit 1; fi
+"$ZEN_SETUP_HELPER" || exit 1
+MAIL_ID="org.mozilla.thunderbird_esr"
+if ! installed_any_scope "$MAIL_ID" && ! install_user_app "$MAIL_ID"; then
+  for fallback in org.mozilla.thunderbird org.mozilla.Thunderbird; do
+    if installed_any_scope "$fallback" || install_user_app "$fallback"; then MAIL_ID="$fallback"; break; fi
+  done
+fi
+FAILED=0
+installed_any_scope "$MAIL_ID" || FAILED=1
+"$MAIL_SETUP" --quiet || FAILED=1
+install_user_app "us.zoom.Zoom" || FAILED=1
+install_user_app "app.ytmdesktop.ytmdesktop" || FAILED=1
+install_user_app "org.libreoffice.LibreOffice" || FAILED=1
+install_user_app "com.usebottles.bottles" || FAILED=1
+if install_user_app "com.github.wwmm.easyeffects"; then
+  flatpak update --user --noninteractive -y "com.github.wwmm.easyeffects" || true
+  "$KLANG_PRESET_HELPER" || FAILED=1
+else FAILED=1; fi
+install_user_app "io.github.kolunmi.Bazaar" || FAILED=1
+if (( FAILED != 0 )); then
+  command -v notify-send >/dev/null 2>&1 && notify-send -u normal "LiMaD Apps" "Mindestens eine Standard-App konnte noch nicht vollständig installiert werden. LiMaD versucht es beim nächsten Login erneut." || true
+  exit 1
+fi
+if command -v gsettings >/dev/null 2>&1 && gsettings list-schemas 2>/dev/null | grep -Fxq org.gnome.shell && gsettings writable org.gnome.shell favorite-apps 2>/dev/null | grep -qx true; then
+  FAVORITES="['${ZEN_ID}.desktop', 'de.limad.Mail.desktop', 'de.limad.Cut.desktop', 'de.limad.Study.desktop', 'de.limad.Notes.desktop', 'de.limad.Drop.desktop', 'de.limad.Link.desktop', 'de.limad.Save.desktop', 'de.limad.WindowsApps.desktop', 'de.limad.Updater.desktop', 'de.limad.AnycubicSlicerNext.desktop', 'us.zoom.Zoom.desktop', 'app.ytmdesktop.ytmdesktop.desktop', 'org.libreoffice.LibreOffice.desktop', 'de.limad.Klang.desktop', 'de.limad.Terminal.desktop', 'io.github.kolunmi.Bazaar.desktop', 'org.gnome.Nautilus.desktop']"
+  gsettings set org.gnome.shell favorite-apps "$FAVORITES" || true
+fi
+printf 'ZEN_ID=%q\nMAIL_ID=%q\n' "$ZEN_ID" "$MAIL_ID" > "$STATE_DIR/default-flatpaks.env"
+touch "$STATE_FILE"
+command -v notify-send >/dev/null 2>&1 && notify-send -u normal "LiMaD Apps bereit" "Zen Browser ist auf Deutsch eingerichtet; LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, LiMaD Klang und Bazaar sind installiert." || true
+echo "LiMaD default Flatpak setup completed"

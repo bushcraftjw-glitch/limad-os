@@ -1,0 +1,19 @@
+[Desktop Entry]
+Actions=Update;
+Type=Application
+Name=LiMaDCut
+GenericName=3D-CAD
+Comment=Offline-3D-CAD mit unabhängigem Updatekanal
+Exec=/usr/local/bin/limad-cut
+Icon=limad-cut
+Terminal=false
+Categories=Graphics;3DGraphics;Engineering;
+Keywords=3D;CAD;STL;OBJ;GLB;3MF;Druck;
+StartupNotify=true
+StartupWMClass=de.limad.Cut
+X-LiMaD-Version=1.1.4
+
+[Desktop Action Update]
+Name=Nach Updates suchen
+Exec=/usr/local/bin/limad-updater --app de.limad.Cut
+Icon=system-software-update

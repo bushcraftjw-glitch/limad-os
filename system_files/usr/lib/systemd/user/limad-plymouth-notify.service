@@ -1,0 +1,7 @@
+[Unit]
+Description=Notify the user when LiMaD Plymouth needs one restart
+ConditionPathExists=/var/lib/limad/plymouth-reboot-required
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/limad-plymouth-notify

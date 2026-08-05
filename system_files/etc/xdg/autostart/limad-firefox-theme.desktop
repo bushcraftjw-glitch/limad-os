@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=LiMaD Firefox-Design
+Comment=Richtet Firefox im LiMaD-Design ein
+Exec=/usr/local/bin/limad-firefox-theme-setup
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=5
+OnlyShowIn=GNOME;
