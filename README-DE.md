@@ -83,3 +83,6 @@ Siehe `docs/BUILD-LIST-DE.md` für die verbindliche Migrationsliste.
 ## Ubuntu-26.04-Layer-Aufbau
 
 Ubuntu 26.04 Desktop verwendet mehrere aufeinander aufbauende SquashFS-Schichten. Der Builder bearbeitet deshalb **nicht** einen unvollständigen Layer isoliert: Er setzt `minimal.squashfs` und `minimal.standard.squashfs` als Overlay zu einem vollständigen RootFS zusammen. Alle LiMaD-Änderungen werden ausschließlich in den Standard-Upper-Layer geschrieben und anschließend wieder als `minimal.standard.squashfs` gepackt. Die originalen Sprach-, Live- und Enhanced-Secure-Boot-Layer bleiben darüber erhalten.
+
+## FIX5 – APT/CD-ROM Build-Korrektur
+Beim GitHub-ISO-Build wird vor dem ersten `apt-get update` eine aus der Ubuntu-Live-ISO geerbte `file:/cdrom`/`cdrom:`-Paketquelle gezielt deaktiviert. Netzwerkquellen bleiben unverändert aktiv. Die Korrektur besitzt einen eigenen Preflight-Test.

@@ -11,6 +11,11 @@ POLICY
 chmod 0755 /usr/sbin/policy-rc.d
 trap 'rm -f /usr/sbin/policy-rc.d' EXIT
 
+# Ubuntu Desktop live media may leave file:/cdrom or cdrom: sources enabled.
+# They work in the live session but are invalid inside the extracted build root.
+# Remove only those media sources before the first apt-get update.
+bash /opt/limad-build/10-apt-live-media-sources.sh /
+
 # Ubuntu 26.04 uses deb822 sources on the desktop ISO. Ensure the components
 # needed by Steam/Lutris are enabled before apt resolves the package list.
 if [[ -f /etc/apt/sources.list.d/ubuntu.sources ]]; then

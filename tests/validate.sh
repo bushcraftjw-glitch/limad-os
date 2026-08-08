@@ -4,13 +4,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 fail() { echo "FATAL: $*" >&2; exit 1; }
 
-echo '[1/10] Shell/Python syntax'
+echo '[1/11] Shell/Python syntax'
 while IFS= read -r -d '' f; do bash -n "$f" || fail "Shell syntax: $f"; done < <(find build_files tools -type f -name '*.sh' -print0)
 bash -n START-GITHUB-BUILD-LINUX.sh
 bash -n START-GITHUB-BUILD-MAC.command
 python3 -m py_compile tools/build-limad-update.py build_files/*.py
 
-echo '[2/10] Ubuntu 26.04 source lock'
+echo '[2/11] Ubuntu 26.04 source lock'
 grep -q 'UBUNTU_VERSION="26.04"' build_files/versions.env || fail 'Ubuntu version lock missing'
 grep -q 'UBUNTU_CODENAME="resolute"' build_files/versions.env || fail 'Ubuntu codename lock missing'
 grep -q '487f87faaf547ea30e0aba4d5b53346292571256b25333a978db1692bcee9dd2' build_files/versions.env || fail 'Ubuntu ISO SHA256 missing'
@@ -18,22 +18,45 @@ grep -q 'casper/minimal.standard.squashfs' build_files/versions.env || fail 'Ubu
 grep -q "'/casper/minimal.squashfs'" build_files/build-iso.sh || fail 'Ubuntu minimal base layer wiring missing'
 grep -q 'lowerdir=\$BASE_ROOT,upperdir=\$STANDARD_UPPER' build_files/build-iso.sh || fail 'Ubuntu layered overlay wiring missing'
 
-echo '[3/10] Theme/Plymouth byte lock'
+echo '[3/11] APT live-media source safety'
+[[ -x build_files/10-apt-live-media-sources.sh ]] || fail 'APT live-media sanitizer missing'
+python3 - <<'PYTEST'
+from pathlib import Path
+import subprocess, tempfile
+with tempfile.TemporaryDirectory() as td:
+    root=Path(td)
+    (root/'etc/apt/sources.list.d').mkdir(parents=True)
+    (root/'etc/apt/sources.list').write_text('deb cdrom:[Ubuntu]/ resolute main restricted\ndeb http://archive.ubuntu.com/ubuntu resolute main\n')
+    (root/'etc/apt/sources.list.d/ubuntu.sources').write_text('Types: deb\nURIs: file:/cdrom\nSuites: resolute\nComponents: main restricted\n\nTypes: deb\nURIs: http://archive.ubuntu.com/ubuntu\nSuites: resolute resolute-updates\nComponents: main restricted universe multiverse\n')
+    subprocess.run(['bash','build_files/10-apt-live-media-sources.sh',str(root)], check=True, stdout=subprocess.DEVNULL)
+    merged='\n'.join(p.read_text() for p in [root/'etc/apt/sources.list', root/'etc/apt/sources.list.d/ubuntu.sources'])
+    active='\n'.join(line for line in merged.splitlines() if not line.lstrip().startswith('#'))
+    if 'file:/cdrom' in active.lower() or 'cdrom:' in active.lower():
+        raise SystemExit('live-media source survived sanitizer')
+    if 'archive.ubuntu.com' not in active:
+        raise SystemExit('network source was accidentally removed')
+PYTEST
+grep -n '10-apt-live-media-sources.sh' build_files/customize-rootfs.sh | head -1 >/dev/null || fail 'APT sanitizer not wired into rootfs customization'
+SAN_LINE=$(grep -n '10-apt-live-media-sources.sh' build_files/customize-rootfs.sh | head -1 | cut -d: -f1)
+APT_LINE=$(grep -n '^apt-get update$' build_files/customize-rootfs.sh | head -1 | cut -d: -f1)
+[[ "$SAN_LINE" -lt "$APT_LINE" ]] || fail 'APT sanitizer must run before apt-get update'
+
+echo '[4/11] Theme/Plymouth byte lock'
 sha256sum -c tests/theme-lock.sha256 >/dev/null
 echo 'cdd81f11c806d5cee160994eaca89d26f3ee1d3adbadc7e7ae3a22dde5ddf3b6  system_files/usr/share/plymouth/themes/limad/boot-splash.png' | sha256sum -c - >/dev/null
 
-echo '[4/10] No legacy immutable runtime path'
+echo '[5/11] No legacy immutable runtime path'
 if grep -RInE 'rpm-ostree|bootc|dnf5?|/ctx/build_files|BASE_IMAGE_REF' \
   system_files/usr/local/bin system_files/usr/share/limad-save build_files \
   --include='*.sh' --include='*.py' 2>/dev/null | grep -Ev '^[^:]+:[0-9]+:[[:space:]]*#' ; then
   fail 'Bazzite/Fedora runtime command survived the Ubuntu port'
 fi
 
-echo '[5/10] Installer contrast safety'
+echo '[6/11] Installer contrast safety'
 find system_files -type f -iname '*anaconda*.css' -print -quit | grep -q . && fail 'Legacy Anaconda CSS is present'
 grep -q 'Do not apply a global text color' build_files/72-installer-safety.sh || fail 'Installer contrast policy missing'
 
-echo '[6/10] Independent updater coverage'
+echo '[7/11] Independent updater coverage'
 python3 - <<'PY'
 import json
 from pathlib import Path
@@ -55,17 +78,17 @@ grep -qx '1.0.0-preview3' system_files/usr/share/limad-save/VERSION || fail 'LiS
 grep -q 'LISAVE_VERSION="1.0.0-preview3"' build_files/versions.env || fail 'LiSave preview3 version lock missing'
 [[ -s updates/LiSave-1.0.0-preview3.limad-update.zip ]] || fail 'Standalone LiSave preview3 update package missing'
 
-echo '[7/10] Gaming/Deskflow stack'
+echo '[8/11] Gaming/Deskflow stack'
 for pkg in steam-installer steam-devices lutris gamemode gamescope libvulkan1:i386 mesa-vulkan-drivers:i386; do grep -Fxq "$pkg" build_files/packages-required.txt || fail "Gaming package missing: $pkg"; done
 grep -q 'org.deskflow.deskflow' system_files/usr/local/bin/limad-install-default-flatpaks || fail 'Deskflow provisioning missing'
 grep -q 'net.davidotek.pupgui2' system_files/usr/local/bin/limad-install-default-flatpaks || fail 'ProtonUp-Qt provisioning missing'
 
-echo '[8/10] Mail/Klang user-update launchers'
+echo '[9/11] Mail/Klang user-update launchers'
 grep -q 'de.limad.Mail/current/payload' system_files/usr/local/bin/limad-mail || fail 'Mail user update root missing'
 grep -q 'de.limad.Klang/current/payload' system_files/usr/local/bin/limad-klang || fail 'Klang user update root missing'
 [[ -s system_files/usr/share/limad-klang/VERSION ]] || fail 'Klang packaging VERSION missing'
 
-echo '[9/10] Update ZIP builder smoke test'
+echo '[10/11] Update ZIP builder smoke test'
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/payload"; printf 'ok\n' > "$TMP/payload/test.txt"
 python3 tools/build-limad-update.py --app-id de.limad.Mail --version 1.8 --payload "$TMP/payload" --output "$TMP/Mail-1.8.limad-update.zip" >/dev/null
@@ -77,14 +100,14 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     assert 'payload/test.txt' in z.namelist()
 PY
 
-echo '[10/10] GitHub build wiring'
+echo '[11/11] GitHub build wiring'
 grep -q 'build_files/build-iso.sh' .github/workflows/build-limad-os.yml || fail 'ISO workflow wiring missing'
 grep -q 'out/updates/' .github/workflows/build-limad-os.yml || fail 'App update artifact wiring missing'
 [[ -x START-GITHUB-BUILD-LINUX.sh && -x START-GITHUB-BUILD-MAC.command ]] || fail 'Starter executables missing'
 grep -q 'gh auth login' tools/github-starter.sh || fail 'Persistent GitHub CLI login wiring missing'
 grep -q 'git commit-tree' tools/github-starter.sh || fail 'Existing remote history preservation missing'
 if grep -q 'GitHub Token (wird nicht gespeichert)' tools/github-starter.sh; then fail 'Legacy per-run token prompt survived'; fi
-grep -q '3.0.0-starter1-fix4' VERSION || fail 'FIX4 version marker missing'
+grep -q '3.0.0-starter1-fix5' VERSION || fail 'FIX5 version marker missing'
 grep -A3 '"app_id": "de.limad.Save"' RELEASE-MANIFEST.json | grep -q '1.0.0-preview3' || fail 'LiSave preview3 release manifest missing'
 
 echo 'OK: LiMaD OS 3.0 starter source validation passed.'
