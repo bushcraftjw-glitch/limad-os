@@ -346,19 +346,63 @@ if [[ "${LIMAD_INSTALL_GDM_THEME}" == "1" ]]; then
   fi
   echo "   GDM service: ${ACTIVE_DM}"
 
-  GDM_RESOURCE="/usr/share/gnome-shell/gnome-shell-theme.gresource"
   GDM_BACKGROUND="/usr/share/backgrounds/limad/${LIMAD_DEFAULT_WALLPAPER}"
-  [[ -s "$GDM_RESOURCE" ]] || { echo "FATAL: GNOME Shell theme resource missing: $GDM_RESOURCE" >&2; exit 1; }
   [[ -s "$GDM_BACKGROUND" ]] || { echo "FATAL: LiMaD GDM background missing: $GDM_BACKGROUND" >&2; exit 1; }
-  BEFORE_SHA256="$(sha256sum "$GDM_RESOURCE" | awk '{print $1}')"
+
+  # MacTahoe does not necessarily overwrite the generic GNOME Shell resource.
+  # On Ubuntu/Yaru it prefers the Yaru GDM resource; on other GNOME systems it
+  # can use /etc/alternatives or the generic resource. Snapshot every existing
+  # candidate by canonical path, then verify which resource actually changed.
+  # This mirrors the target selection used by MacTahoe's install_only_gdm_theme().
+  GDM_RESOURCE_CANDIDATES=(
+    /usr/share/gnome-shell/theme/Pop/gnome-shell-theme.gresource
+    /usr/share/gnome-shell/theme/Yaru/gnome-shell-theme.gresource
+    /usr/share/gnome-shell/theme/ZorinBlue-Dark/gnome-shell-theme.gresource
+    /usr/share/gnome-shell/theme/ZorinBlue-Light/gnome-shell-theme.gresource
+    /usr/share/gnome-shell/gnome-shell-theme.gresource
+    /etc/alternatives/gdm3-theme.gresource
+  )
+  declare -A GDM_RESOURCE_BEFORE=()
+  for candidate in "${GDM_RESOURCE_CANDIDATES[@]}"; do
+    [[ -e "$candidate" ]] || continue
+    canonical="$(readlink -f "$candidate" 2>/dev/null || true)"
+    [[ -n "$canonical" && -s "$canonical" ]] || continue
+    if [[ -z "${GDM_RESOURCE_BEFORE[$canonical]+x}" ]]; then
+      GDM_RESOURCE_BEFORE["$canonical"]="$(sha256sum "$canonical" | awk '{print $1}')"
+      echo "   GDM resource candidate: ${canonical}"
+    fi
+  done
+  ((${#GDM_RESOURCE_BEFORE[@]} > 0)) || { echo "FATAL: no usable GNOME/GDM theme resource found" >&2; exit 1; }
 
   if ! ./tweaks.sh -g -b "$GDM_BACKGROUND" -nd -nb -c dark -t purple >"$LOG" 2>&1; then
     echo "FATAL: MacTahoe GDM theming failed on Ubuntu" >&2
     tail -n 40 "$LOG" 2>/dev/null | sed 's/^/   | /' >&2 || true
     exit 1
   fi
-  AFTER_SHA256="$(sha256sum "$GDM_RESOURCE" | awk '{print $1}')"
-  [[ "$AFTER_SHA256" != "$BEFORE_SHA256" ]] || { echo "FATAL: GDM resource did not change" >&2; exit 1; }
+
+  GDM_RESOURCE=""
+  BEFORE_SHA256=""
+  AFTER_SHA256=""
+  for canonical in "${!GDM_RESOURCE_BEFORE[@]}"; do
+    [[ -s "$canonical" ]] || continue
+    after="$(sha256sum "$canonical" | awk '{print $1}')"
+    if [[ "$after" != "${GDM_RESOURCE_BEFORE[$canonical]}" ]]; then
+      GDM_RESOURCE="$canonical"
+      BEFORE_SHA256="${GDM_RESOURCE_BEFORE[$canonical]}"
+      AFTER_SHA256="$after"
+      break
+    fi
+  done
+  if [[ -z "$GDM_RESOURCE" ]]; then
+    echo "FATAL: MacTahoe reported success but none of the GDM resource candidates changed" >&2
+    echo "       candidates checked:" >&2
+    for canonical in "${!GDM_RESOURCE_BEFORE[@]}"; do
+      echo "       - $canonical" >&2
+    done
+    tail -n 40 "$LOG" 2>/dev/null | sed 's/^/   | /' >&2 || true
+    exit 1
+  fi
+  echo "   Branded GDM resource: ${GDM_RESOURCE}"
 
   install -d /usr/share/limad
   cat > /usr/share/limad/gdm-branding.env <<EOF
