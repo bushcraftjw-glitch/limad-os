@@ -23,6 +23,7 @@ if [[ -f /etc/apt/sources.list.d/ubuntu.sources ]]; then
 fi
 dpkg --add-architecture i386 || true
 apt-get update
+bash /opt/limad-build/11-apt-required-preflight.sh /opt/limad-build/packages-required.txt
 mapfile -t REQUIRED < <(grep -Ev '^\s*(#|$)' /opt/limad-build/packages-required.txt)
 apt-get install -y --no-install-recommends "${REQUIRED[@]}"
 while IFS= read -r pkg; do

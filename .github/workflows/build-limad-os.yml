@@ -17,22 +17,32 @@ concurrency:
 
 jobs:
   validate:
-    name: Validate source
+    name: Validate LiMaD source
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Validate LiMaD source
         run: bash tests/validate.sh
 
+  validate_apps:
+    name: Validate LiMaD apps & updates
+    needs: validate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Validate all updater-managed apps and update ZIPs
+        run: bash tests/validate-apps.sh
+
   build:
     name: Build Ubuntu-based ISO
-    needs: validate
+    needs: validate_apps
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free runner disk space
         run: |

@@ -24,7 +24,7 @@ edge-tiling=true
 dynamic-workspaces=true
 
 [org.gnome.shell]
-enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com', 'dash-to-dock@micxgx.gmail.com', 'blur-my-shell@aunetx', 'logomenu@aryan_k', 'lidrop@limad.local', 'lilink@limad.local']
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com', 'ubuntu-dock@ubuntu.com', 'blur-my-shell@aunetx', 'logomenu@aryan_k', 'lidrop@limad.local', 'lilink@limad.local']
 favorite-apps=['app.zen_browser.zen.desktop', 'de.limad.Mail.desktop', 'de.limad.Cut.desktop', 'de.limad.Study.desktop', 'de.limad.Notes.desktop', 'de.limad.Drop.desktop', 'de.limad.Link.desktop', 'de.limad.Save.desktop', 'de.limad.WindowsApps.desktop', 'de.limad.Updater.desktop', 'de.limad.AnycubicSlicerNext.desktop', 'us.zoom.Zoom.desktop', 'app.ytmdesktop.ytmdesktop.desktop', 'org.libreoffice.LibreOffice.desktop', 'de.limad.Klang.desktop', 'de.limad.Terminal.desktop', 'io.github.kolunmi.Bazaar.desktop', 'org.gnome.Nautilus.desktop']
 
 [org.gnome.shell.extensions.user-theme]

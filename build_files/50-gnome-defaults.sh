@@ -49,7 +49,7 @@ fi
 # matches what actually got installed.
 declare -A LIMAD_EXTENSION_DIRS=(
   [user-theme@gnome-shell-extensions.gcampax.github.com]=1
-  [dash-to-dock@micxgx.gmail.com]=1
+  [ubuntu-dock@ubuntu.com]=1
   [blur-my-shell@aunetx]=1
   [logomenu@aryan_k]=1
 )

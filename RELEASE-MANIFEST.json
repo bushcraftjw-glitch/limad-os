@@ -1,9 +1,9 @@
 {
   "product": "LiMaD OS",
-  "version": "3.0.0-starter1-fix5",
+  "version": "3.0.0-starter1-fix6",
   "release_channel": "starter",
   "build_status": {
-    "static_source_validation": "passed_11_of_11",
+    "static_source_validation": "passed_12_of_12_plus_app_update_preflight",
     "full_github_iso_build": "not_yet_executed",
     "hardware_install_validation": "not_yet_executed"
   },

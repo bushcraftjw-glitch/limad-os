@@ -11,7 +11,7 @@ gnome-tweaks
 gnome-shell-extensions
 gnome-shell-extension-manager
 gnome-shell-extension-user-theme
-gnome-shell-extension-dash-to-dock
+gnome-shell-ubuntu-extensions
 plymouth
 plymouth-themes
 gnome-themes-extra

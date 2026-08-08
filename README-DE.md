@@ -86,3 +86,6 @@ Ubuntu 26.04 Desktop verwendet mehrere aufeinander aufbauende SquashFS-Schichten
 
 ## FIX5 – APT/CD-ROM Build-Korrektur
 Beim GitHub-ISO-Build wird vor dem ersten `apt-get update` eine aus der Ubuntu-Live-ISO geerbte `file:/cdrom`/`cdrom:`-Paketquelle gezielt deaktiviert. Netzwerkquellen bleiben unverändert aktiv. Die Korrektur besitzt einen eigenen Preflight-Test.
+
+## FIX6 – Ubuntu-Dock + Paket-Preflight + 3-stufige Pipeline
+Ubuntu 26.04 liefert Dash-to-Dock als Ubuntu-Dock im Paket `gnome-shell-ubuntu-extensions`; die aktive Extension-ID ist `ubuntu-dock@ubuntu.com`. FIX6 ersetzt den nicht verfügbaren alten Paketnamen, prüft nach `apt-get update` alle Pflichtpakete gesammelt auf einen installierbaren Candidate und trennt GitHub Actions wieder sichtbar in drei Phasen: Quellvalidierung, App-/Updatevalidierung und ISO-Build.
