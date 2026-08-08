@@ -2,7 +2,7 @@
 
 Dieses Repository ist der neue Ubuntu-basierte Build-Unterbau für LiMaD OS.
 
-**Version:** `3.0.0-starter1-fix4`  
+**Version:** `3.0.0-starter1-fix9`  
 **Basis:** Ubuntu 26.04 LTS AMD64 / GNOME 50  
 **Ziel:** Den bestätigten LiMaD-Desktop und die LiMaD-Programme möglichst verlustfrei von Bazzite/Fedora auf Ubuntu migrieren.
 
@@ -11,7 +11,7 @@ Dieses Repository ist der neue Ubuntu-basierte Build-Unterbau für LiMaD OS.
 Nach erfolgreichem Workflow stehen zwei Artefakte bereit:
 
 1. `LiMaD-OS-3.0-ISO`
-   - `LiMaD-OS-3.0.0-starter1-fix4-amd64.iso`
+   - `LiMaD-OS-3.0.0-starter1-fix9-amd64.iso`
    - SHA256-Datei
    - Build-Info
 2. `LiMaD-OS-3.0-App-Updates`
@@ -82,10 +82,13 @@ Siehe `docs/BUILD-LIST-DE.md` für die verbindliche Migrationsliste.
 
 ## Ubuntu-26.04-Layer-Aufbau
 
-Ubuntu 26.04 Desktop verwendet mehrere aufeinander aufbauende SquashFS-Schichten. Der Builder bearbeitet deshalb **nicht** einen unvollständigen Layer isoliert: Er setzt `minimal.squashfs` und `minimal.standard.squashfs` als Overlay zu einem vollständigen RootFS zusammen. Alle LiMaD-Änderungen werden ausschließlich in den Standard-Upper-Layer geschrieben und anschließend wieder als `minimal.standard.squashfs` gepackt. Die originalen Sprach-, Live- und Enhanced-Secure-Boot-Layer bleiben darüber erhalten.
+Ubuntu 26.04 Desktop verwendet mehrere aufeinander aufbauende SquashFS-Schichten. FIX9 behandelt den **installierten Standard-Layer und den Live-/Installer-Layer getrennt und konsistent**: `minimal.squashfs + minimal.standard.squashfs` bilden das installierte Zielsystem; `minimal.standard.live.squashfs` bleibt der Live-/Installer-Delta-Layer. Änderungen, die im Standard-Layer von einem älteren Live-Dateipfad überschattet würden, werden gezielt in den Live-Layer synchronisiert. Live-spezifische Installer-Dateien bleiben erhalten. Die Live-Session verwendet bewusst die originale Ubuntu-GDM-Ressource, während das installierte System das LiMaD-GDM-Branding behält.
 
 ## FIX5 – APT/CD-ROM Build-Korrektur
 Beim GitHub-ISO-Build wird vor dem ersten `apt-get update` eine aus der Ubuntu-Live-ISO geerbte `file:/cdrom`/`cdrom:`-Paketquelle gezielt deaktiviert. Netzwerkquellen bleiben unverändert aktiv. Die Korrektur besitzt einen eigenen Preflight-Test.
 
 ## FIX6 – Ubuntu-Dock + Paket-Preflight + 3-stufige Pipeline
 Ubuntu 26.04 liefert Dash-to-Dock als Ubuntu-Dock im Paket `gnome-shell-ubuntu-extensions`; die aktive Extension-ID ist `ubuntu-dock@ubuntu.com`. FIX6 ersetzt den nicht verfügbaren alten Paketnamen, prüft nach `apt-get update` alle Pflichtpakete gesammelt auf einen installierbaren Candidate und trennt GitHub Actions wieder sichtbar in drei Phasen: Quellvalidierung, App-/Updatevalidierung und ISO-Build.
+
+## FIX9 – Live-Boot-/Installer-Stabilität
+FIX9 korrigiert den beim ersten Hardwaretest beobachteten schwarzen Bildschirm vor dem Live-Desktop. Der Builder erzeugt nun neben `minimal.standard.squashfs` auch den zugehörigen `minimal.standard.live.squashfs` neu, prüft den Ubuntu-Desktop-Installer-Service und GNOME/GDM-Ressourcen im zusammengebauten Live-RootFS und schützt die Live-Session mit der originalen Ubuntu-GDM-Ressource. Zusätzlich ist das GRUB-Menü zehn Sekunden sichtbar und bietet einen eigenen `LiMaD OS - Safe Graphics`-Eintrag mit `nomodeset`.

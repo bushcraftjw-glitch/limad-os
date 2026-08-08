@@ -1,11 +1,13 @@
 {
   "product": "LiMaD OS",
-  "version": "3.0.0-starter1-fix8",
+  "version": "3.0.0-starter1-fix9",
   "release_channel": "starter",
   "build_status": {
-    "static_source_validation": "passed_14_of_14_plus_app_update_preflight",
-    "full_github_iso_build": "not_yet_executed",
-    "hardware_install_validation": "not_yet_executed"
+    "static_source_validation": "passed_16_of_16_plus_app_update_preflight",
+    "previous_fix8_github_iso_build": "passed",
+    "previous_fix8_hardware_live_boot": "failed_black_screen_before_live_desktop",
+    "fix9_full_github_iso_build": "not_yet_executed",
+    "fix9_hardware_install_validation": "not_yet_executed"
   },
   "base": {
     "distribution": "Ubuntu",
@@ -17,9 +19,13 @@
     "iso_sha256": "487f87faaf547ea30e0aba4d5b53346292571256b25333a978db1692bcee9dd2",
     "layer_model": [
       "casper/minimal.squashfs",
-      "casper/minimal.standard.squashfs"
+      "casper/minimal.standard.squashfs",
+      "casper/minimal.standard.live.squashfs"
     ],
-    "modified_layer": "casper/minimal.standard.squashfs"
+    "modified_layer": [
+      "casper/minimal.standard.squashfs",
+      "casper/minimal.standard.live.squashfs"
+    ]
   },
   "design_lock": {
     "theme_lock_file": "tests/theme-lock.sha256",
@@ -119,6 +125,17 @@
     "Fedora/Bazzite/rpm-ostree/bootc runtime path removed from the Ubuntu build path.",
     "LiDrop 0.12.0-preview8 is embedded from the supplied standalone update package; its internal SHA256SUMS validation passed before integration.",
     "Windows-Programme deliberately remains at 2.2.6 until the Ubuntu base is proven on real hardware.",
-    "The first GitHub Actions ISO build and real hardware installation are still required before promoting starter1 to RC."
-  ]
+    "The first GitHub Actions ISO build and real hardware installation are still required before promoting starter1 to RC.",
+    "FIX9 rebuilds both the installed standard layer and the live/installer layer, reconciles shadowed changed files, keeps stock Ubuntu GDM resources in the live session, and exposes a 10-second GRUB menu with Safe Graphics."
+  ],
+  "live_boot_safety": {
+    "visible_grub_menu_seconds": 10,
+    "normal_entry": "LiMaD OS starten oder installieren",
+    "safe_graphics_entry": "LiMaD OS - Safe Graphics",
+    "safe_graphics_kernel_parameter": "nomodeset",
+    "stock_ubuntu_gdm_resource_in_live_session": true,
+    "limad_gdm_branding_in_installed_system": true,
+    "live_shadow_reconciliation": true,
+    "final_iso_boot_config_verification": true
+  }
 }
