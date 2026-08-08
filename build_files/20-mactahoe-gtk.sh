@@ -324,16 +324,27 @@ if [[ "${LIMAD_INSTALL_GDM_THEME}" == "1" ]]; then
 
   GDM_UNIT=""
   for candidate in /usr/lib/systemd/system/gdm3.service /lib/systemd/system/gdm3.service /usr/lib/systemd/system/gdm.service; do
-    if [[ -f "$candidate" ]]; then GDM_UNIT="$candidate"; break; fi
+    if [[ -f "$candidate" ]]; then
+      # Canonicalize because Ubuntu uses usr-merge: /lib may resolve to /usr/lib.
+      # Comparing a raw /lib path with readlink -f (/usr/lib) produced a false failure.
+      GDM_UNIT="$(readlink -f "$candidate")"
+      break
+    fi
   done
-  [[ -n "$GDM_UNIT" ]] || { echo "FATAL: Ubuntu GDM service is missing" >&2; exit 1; }
+  [[ -n "$GDM_UNIT" && -f "$GDM_UNIT" ]] || { echo "FATAL: Ubuntu GDM service is missing" >&2; exit 1; }
 
   systemctl disable sddm.service plasmalogin.service >/dev/null 2>&1 || true
   systemctl enable "$(basename "$GDM_UNIT")" >/dev/null 2>&1 || true
   install -d /etc/systemd/system
   ln -sfn "$GDM_UNIT" /etc/systemd/system/display-manager.service
   ACTIVE_DM="$(readlink -f /etc/systemd/system/display-manager.service || true)"
-  [[ "$ACTIVE_DM" == "$GDM_UNIT" ]] || { echo "FATAL: display manager link was not set to GDM" >&2; exit 1; }
+  if [[ -z "$ACTIVE_DM" || "$ACTIVE_DM" != "$GDM_UNIT" ]]; then
+    echo "FATAL: display manager link was not set to canonical GDM service" >&2
+    echo "       expected: $GDM_UNIT" >&2
+    echo "       actual:   ${ACTIVE_DM:-<unresolved>}" >&2
+    exit 1
+  fi
+  echo "   GDM service: ${ACTIVE_DM}"
 
   GDM_RESOURCE="/usr/share/gnome-shell/gnome-shell-theme.gresource"
   GDM_BACKGROUND="/usr/share/backgrounds/limad/${LIMAD_DEFAULT_WALLPAPER}"

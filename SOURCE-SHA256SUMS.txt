@@ -3,13 +3,13 @@
 56b008cda90b2cf91c542b78b573f7591336dcaef6c832d30c619cd0434bdfe8  ./LICENSE-NOTICE.md
 b9de02a488903fe7081284720861644b2623bb79a782df4a77038a18acda4bb8  ./README-DE.md
 cdd06ebc3749bc811d1c22164110c09fb12de6b2937ef2172820c410e2201e85  ./README.md
-2cdf99a6d33ef4392cb482c1ad49f9fc5d57263a41c895e2b2cf3a0bdbb8a102  ./RELEASE-MANIFEST.json
+47e403e2e84b8d3b59c7268f50990c5d4fa42b944476d05a52c91f0cd4aee519  ./RELEASE-MANIFEST.json
 2bddef8ac62df3ba196f37da3c97a4fd2607c8d54f9c9ebc1f126b8a638cea4d  ./START-GITHUB-BUILD-LINUX.sh
 e572441b466a122bc0ab475c8d48bda1bdc949a9a5f4bd3bafc367f1ead6f083  ./START-GITHUB-BUILD-MAC.command
-3a24544030cd2f820c010d928a94a25dcf897409961701139fdf274ba7ec5125  ./VERSION
+e5dac017c2ee2c68fa883a8118696853abcc06a6cb1611c9e6300ba63bb26421  ./VERSION
 e4b433961daacec316fd8e52eda1b1db74bc14dff64e94f023c6adb933f8b276  ./build_files/10-apt-live-media-sources.sh
 1ee6fa6c62ae71571dd370181d02a8f83507f36aaa8668d689d7eba597d2f0db  ./build_files/11-apt-required-preflight.sh
-de6c1a7d4ac2125961dc99fb5aec96a59f43c64aa7b1df8343aaa0bb0c1b1728  ./build_files/20-mactahoe-gtk.sh
+6b8781d08a779094e3e9e2a6d908318ee2c4b8b67da1f7ed2d2da85f3bd5fa4b  ./build_files/20-mactahoe-gtk.sh
 47eb14e926f9d619ebea7520a8b753027c62eb34f7a8a5f467cce26815464cf4  ./build_files/30-whitesur-icons.sh
 ffd4bb8f002b02665331b7c73af6f5f4357dc56259529d0bf9c515826c3a026b  ./build_files/40-limad-icons.sh
 ab699944e0f4fb863e4720cc8bab8537efc1a56bce7940d79dd3f64cafee8bb3  ./build_files/45-logomenu-extension.sh
@@ -41,6 +41,7 @@ d82b026597ddbf25b82196cc8512bae24b468306c6ad3b309616c5389690f0ec  ./build_files/
 e0039bb5907142174d1eb4cc0fb3ebd439e66f310599ab7364051ab1505ba712  ./docs/BUILD-LIST-DE.md
 1f19e8a76003b71c3a583d7979f3c20b208953ac5112be7afc072e1c861553ca  ./docs/source-validation/APT-CDROM-FIX5.md
 509d6dde5d592f424d3de43a3b98b3c696b237a244ade478a5ac52400ceae409  ./docs/source-validation/FIX4-GITHUB-AUTH-REMOTE-HISTORY.md
+2705a713a3a3f8a0355b99556d65954e53b166bd06c05f717313e0d1a5b6345c  ./docs/source-validation/GDM-USR-MERGE-FIX.md
 ecb31414c23a2bdd1df26d166965ede4609efeac4b5ef39760a2db17ebd1c190  ./docs/source-validation/INSTALLER-TEXT-KONTRAST-FIX-DE.md
 dd2ef036d30684eb7b68330a6a99a0884504c74df8d3d11d7d69ad5900e28cf1  ./docs/source-validation/LIDROP-PREVIEW8.md
 5824b18d4d649079f163fc68de9c9b7847aa271ae7a33778aa20f7b20226bbec  ./docs/source-validation/PHASE-5-RC2-BUILD5.md
@@ -682,7 +683,7 @@ e9ffa66a4568bdeb3335263b1c013b799d90408f9369c80515a8519f50a010b8  ./system_files
 b1013d2e1b2f2fafec0669a9b2848cdd4091a4e057b3940f9b993dfe273023f7  ./system_files/usr/share/polkit-1/rules.d/49-limad-screen-share.rules
 4eadcda634453385cd45a03e2c3a0f560be21d17cc3efe34192d9279db753f2f  ./tests/theme-lock.sha256
 d3414d51c8f5bffa9c3b4d91c36b7422678179037dc523f20b96c9e9ec49c9f0  ./tests/validate-apps.sh
-dd30fc7b5d2e3dba85c7554b27ab354efe73c28f6a0f508a3ee89c58746552f5  ./tests/validate.sh
+ed143d8d5feb11bfabb193bf580af16f5554e0ec875d249314eca7b3a9d1a96e  ./tests/validate.sh
 7bc029a596e1fe4d3d77282f9e1a5d890767fdbb6d4e752f07169e2d6fb59db8  ./tools/build-all-updates.sh
 679482de6930e9c905454e341af5361ad68b5fae3ead4e507bbf3f94cfbb2510  ./tools/build-limad-update.py
 33999204550062b1fb8584faa5ba71cc739869ee5b3090c242093e054c50960d  ./tools/github-starter.sh
