@@ -6,7 +6,7 @@
 set -Eeuo pipefail
 
 # shellcheck source=/dev/null
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 readonly WORK="/tmp/limad-build/whitesur-icons"
 readonly SRC_SHARE="/usr/share/limad-source/whitesur-icon-theme"

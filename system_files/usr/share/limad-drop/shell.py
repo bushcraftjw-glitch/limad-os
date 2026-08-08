@@ -13,7 +13,7 @@ from pathlib import Path
 APP_ID = "de.limad.Drop"
 APP_NAME = "LiDrop"
 SERVICE = "limad-drop.service"
-EXPECTED_VERSION = "0.12.0-preview5"
+EXPECTED_VERSION = "0.12.0-preview8"
 
 
 def runtime_file() -> Path:

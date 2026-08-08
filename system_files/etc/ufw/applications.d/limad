@@ -1,0 +1,9 @@
+[LiDrop]
+title=LiDrop
+description=Lokale Dateiübertragung
+ports=47777/tcp
+
+[LiLink]
+title=LiLink
+description=TLS-Geräteverbindung
+ports=47888:47898/tcp

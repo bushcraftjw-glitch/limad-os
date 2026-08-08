@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/limad"
-STATE_FILE="$STATE_DIR/default-flatpaks-rc2-build5.done"
+STATE_FILE="$STATE_DIR/default-flatpaks-3.0-starter1.done"
 mkdir -p "$STATE_DIR"
 [[ -f "$STATE_FILE" ]] && exit 0
-command -v notify-send >/dev/null 2>&1 && notify-send -u low "LiMaD richtet zusätzliche Programme ein" "Zen Browser auf Deutsch, LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, Klang und Bazaar werden vorbereitet." || true
+command -v notify-send >/dev/null 2>&1 && notify-send -u low "LiMaD richtet zusätzliche Programme ein" "Zen Browser, LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, Klang, Deskflow und ProtonUp-Qt werden vorbereitet." || true
 FLATHUB_URL="https://dl.flathub.org/repo/flathub.flatpakrepo"
 MAIL_SETUP="${LIMAD_MAIL_SETUP_HELPER:-/usr/local/bin/limad-mail-setup}"
 KLANG_PRESET_HELPER="${LIMAD_KLANG_PRESET_HELPER:-/usr/local/bin/limad-install-klang-preset}"
@@ -44,6 +44,8 @@ if install_user_app "com.github.wwmm.easyeffects"; then
   "$KLANG_PRESET_HELPER" || FAILED=1
 else FAILED=1; fi
 install_user_app "io.github.kolunmi.Bazaar" || FAILED=1
+install_user_app "org.deskflow.deskflow" || FAILED=1
+install_user_app "net.davidotek.pupgui2" || FAILED=1
 if (( FAILED != 0 )); then
   command -v notify-send >/dev/null 2>&1 && notify-send -u normal "LiMaD Apps" "Mindestens eine Standard-App konnte noch nicht vollständig installiert werden. LiMaD versucht es beim nächsten Login erneut." || true
   exit 1
@@ -54,5 +56,5 @@ if command -v gsettings >/dev/null 2>&1 && gsettings list-schemas 2>/dev/null | 
 fi
 printf 'ZEN_ID=%q\nMAIL_ID=%q\n' "$ZEN_ID" "$MAIL_ID" > "$STATE_DIR/default-flatpaks.env"
 touch "$STATE_FILE"
-command -v notify-send >/dev/null 2>&1 && notify-send -u normal "LiMaD Apps bereit" "Zen Browser ist auf Deutsch eingerichtet; LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, LiMaD Klang und Bazaar sind installiert." || true
+command -v notify-send >/dev/null 2>&1 && notify-send -u normal "LiMaD Apps bereit" "Zen Browser ist auf Deutsch eingerichtet; LiMaD Mail, Zoom, YTMDesktop, LibreOffice, Bottles, LiMaD Klang, Deskflow und ProtonUp-Qt sind installiert." || true
 echo "LiMaD default Flatpak setup completed"

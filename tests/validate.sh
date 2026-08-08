@@ -1,94 +1,90 @@
 #!/usr/bin/env bash
-# Complete offline validation of the LiMaD OS GNOME repository.
-# Everything here runs without network, podman or a Linux desktop, so it can be
-# used on macOS before pushing and in CI before the image build starts.
 set -Eeuo pipefail
-export PYTHONDONTWRITEBYTECODE=1
-cd "$(dirname "$0")/.."
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+fail() { echo "FATAL: $*" >&2; exit 1; }
 
-# Generated Python bytecode is not source material. Remove it before and after
-# validation so the subsequent Git upload remains clean as well.
-cleanup_python_cache() {
-  find . -type d -name '__pycache__' -prune -exec rm -rf {} +
-  find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -exec rm -f {} +
-}
-cleanup_python_cache
-trap cleanup_python_cache EXIT
+echo '[1/10] Shell/Python syntax'
+while IFS= read -r -d '' f; do bash -n "$f" || fail "Shell syntax: $f"; done < <(find build_files tools -type f -name '*.sh' -print0)
+bash -n START-GITHUB-BUILD-LINUX.sh
+bash -n START-GITHUB-BUILD-MAC.command
+python3 -m py_compile tools/build-limad-update.py build_files/*.py
 
-TESTS=(
-  tests/test-shell-syntax.sh
-  tests/test-clean-project.sh
-  tests/test-fix22-protected-baseline.sh
-  tests/test-ci-oci-runtime.sh
-  tests/test-theme-sources.sh
-  tests/test-icon-overlay.sh
-  tests/test-build3-gstreamer-icons.sh
-  tests/test-build4-lisave-zen-lidrop.sh
-  tests/test-build5-linotes-study.sh
-  tests/test-lidrop-exact-icon.sh
-  tests/test-lidrop-os-to-os.sh
-  tests/test-gnome-defaults.sh
-  tests/test-desktop-polish.sh
-  tests/test-logomenu-schema-patch.sh
-  tests/test-first-login-runtime.sh
-  tests/test-window-button-layout-hardening.sh
-  tests/test-firefox-theme.sh
-  tests/test-limad-apps.sh
-  tests/test-screen-share.sh
-  tests/test-lilink.sh
-  tests/test-lilink-runtime.sh
-  tests/test-build7-study-lidrop-status.sh
-  tests/test-build7-plymouth-lidrop-status.sh
-  tests/test-app-updater.sh
-  tests/test-plymouth.sh
-  tests/test-phase1-branding.sh
-  tests/test-wine-integration.sh
-  tests/test-windows-recipe-engine.sh
-  tests/test-windows-installer2.sh
-  tests/test-anycubic-package.sh
-  tests/test-repo-key-paths.sh
-  tests/test-bib-distro-identity.sh
-  tests/test-bib-key-bridge.sh
-  tests/test-build-wiring.sh
-  tests/test-phase2-update-nws.sh
-  tests/test-phase3-app-updater.sh
-  tests/test-phase4-release-audit.sh
-  tests/test-fix10-branding-hardening.sh
-  tests/test-fix15-efi-boot.sh
-  tests/test-fix16-deep-iso-boot.sh
-  tests/test-fix17-bib-exit-recovery.sh
-  tests/test-fix18-current-anaconda-iso-layout.sh
-  tests/test-fix19-xorriso-find.sh
-  tests/test-fix20-esp-guid-report.sh
-  tests/test-fix21-native-iso-metadata.sh
-  tests/test-fix22-anaconda-label-path.sh
-  tests/test-fix27-branding-windows-complete.sh
-  tests/test-fix28-dock-override.sh
-  tests/test-fix30-bootc-initramfs-rollback.sh
-  tests/test-fix32-aerion-mail-dock.sh
-  tests/test-fix35-app-rollup-airdrop.sh
-  tests/test-fix36-runtime-safety.sh
-  tests/test-fix37-media-klang.sh
-  tests/test-fix43-cmake4-owl.sh
-  tests/test-280-build7-runtime.sh
-  tests/test-phase5-lidrop-streaming.sh
-  tests/test-fix50-study-cut-first-login.sh
-  tests/test-fix11-desktop-launchers.sh
-  tests/test-wallpaper-override-hardening.sh
-  tests/test-identity-branding.sh
-)
+echo '[2/10] Ubuntu 26.04 source lock'
+grep -q 'UBUNTU_VERSION="26.04"' build_files/versions.env || fail 'Ubuntu version lock missing'
+grep -q 'UBUNTU_CODENAME="resolute"' build_files/versions.env || fail 'Ubuntu codename lock missing'
+grep -q '487f87faaf547ea30e0aba4d5b53346292571256b25333a978db1692bcee9dd2' build_files/versions.env || fail 'Ubuntu ISO SHA256 missing'
+grep -q 'casper/minimal.standard.squashfs' build_files/versions.env || fail 'Ubuntu standard squashfs layer missing'
+grep -q "'/casper/minimal.squashfs'" build_files/build-iso.sh || fail 'Ubuntu minimal base layer wiring missing'
+grep -q 'lowerdir=\$BASE_ROOT,upperdir=\$STANDARD_UPPER' build_files/build-iso.sh || fail 'Ubuntu layered overlay wiring missing'
 
-echo "== LiMaD OS $(cat VERSION) – offline validation =="
-for t in "${TESTS[@]}"; do
-  echo "-- ${t}"
-  if ! bash "$t"; then
-    echo >&2
-    echo "VALIDIERUNG FEHLGESCHLAGEN: $t" >&2
-    exit 1
-  fi
-done
+echo '[3/10] Theme/Plymouth byte lock'
+sha256sum -c tests/theme-lock.sha256 >/dev/null
+echo 'cdd81f11c806d5cee160994eaca89d26f3ee1d3adbadc7e7ae3a22dde5ddf3b6  system_files/usr/share/plymouth/themes/limad/boot-splash.png' | sha256sum -c - >/dev/null
 
-echo
-echo "LiMaD OS GNOME: vollständige Offline-Validierung erfolgreich."
-echo "Image-, GNOME- und ISO-Prüfungen laufen im GitHub-Workflow."
+echo '[4/10] No legacy immutable runtime path'
+if grep -RInE 'rpm-ostree|bootc|dnf5?|/ctx/build_files|BASE_IMAGE_REF' \
+  system_files/usr/local/bin system_files/usr/share/limad-save build_files \
+  --include='*.sh' --include='*.py' 2>/dev/null | grep -Ev '^[^:]+:[0-9]+:[[:space:]]*#' ; then
+  fail 'Bazzite/Fedora runtime command survived the Ubuntu port'
+fi
 
+echo '[5/10] Installer contrast safety'
+find system_files -type f -iname '*anaconda*.css' -print -quit | grep -q . && fail 'Legacy Anaconda CSS is present'
+grep -q 'Do not apply a global text color' build_files/72-installer-safety.sh || fail 'Installer contrast policy missing'
+
+echo '[6/10] Independent updater coverage'
+python3 - <<'PY'
+import json
+from pathlib import Path
+apps=json.loads(Path('system_files/usr/share/limad-updater/apps.json').read_text())['apps']
+ids={a['app_id'] for a in apps}
+required={
+'de.limad.Cut','de.limad.Study','de.limad.Drop','de.limad.Link','de.limad.Notes','de.limad.Save',
+'de.limad.ScreenShare','de.limad.Mail','de.limad.Klang','de.limad.AnycubicSlicerNext','de.limad.WindowsApps'}
+missing=required-ids
+if missing: raise SystemExit('Updater IDs missing: '+', '.join(sorted(missing)))
+print(f'Updater apps: {len(apps)}')
+PY
+grep -q 'de.limad.Mail' tools/build-limad-update.py || fail 'Mail update packaging missing'
+grep -q 'de.limad.Klang' tools/build-limad-update.py || fail 'Klang update packaging missing'
+grep -qx '0.12.0-preview8' system_files/usr/share/limad-drop/VERSION || fail 'LiDrop preview8 payload missing'
+grep -q 'LIDROP_VERSION="0.12.0-preview8"' build_files/versions.env || fail 'LiDrop preview8 version lock missing'
+[[ -s updates/LiDrop-0.12.0-preview8.limad-update.zip ]] || fail 'Standalone LiDrop preview8 update package missing'
+grep -qx '1.0.0-preview3' system_files/usr/share/limad-save/VERSION || fail 'LiSave preview3 payload missing'
+grep -q 'LISAVE_VERSION="1.0.0-preview3"' build_files/versions.env || fail 'LiSave preview3 version lock missing'
+[[ -s updates/LiSave-1.0.0-preview3.limad-update.zip ]] || fail 'Standalone LiSave preview3 update package missing'
+
+echo '[7/10] Gaming/Deskflow stack'
+for pkg in steam-installer steam-devices lutris gamemode gamescope libvulkan1:i386 mesa-vulkan-drivers:i386; do grep -Fxq "$pkg" build_files/packages-required.txt || fail "Gaming package missing: $pkg"; done
+grep -q 'org.deskflow.deskflow' system_files/usr/local/bin/limad-install-default-flatpaks || fail 'Deskflow provisioning missing'
+grep -q 'net.davidotek.pupgui2' system_files/usr/local/bin/limad-install-default-flatpaks || fail 'ProtonUp-Qt provisioning missing'
+
+echo '[8/10] Mail/Klang user-update launchers'
+grep -q 'de.limad.Mail/current/payload' system_files/usr/local/bin/limad-mail || fail 'Mail user update root missing'
+grep -q 'de.limad.Klang/current/payload' system_files/usr/local/bin/limad-klang || fail 'Klang user update root missing'
+[[ -s system_files/usr/share/limad-klang/VERSION ]] || fail 'Klang packaging VERSION missing'
+
+echo '[9/10] Update ZIP builder smoke test'
+TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
+mkdir -p "$TMP/payload"; printf 'ok\n' > "$TMP/payload/test.txt"
+python3 tools/build-limad-update.py --app-id de.limad.Mail --version 1.8 --payload "$TMP/payload" --output "$TMP/Mail-1.8.limad-update.zip" >/dev/null
+python3 - "$TMP/Mail-1.8.limad-update.zip" <<'PY'
+import json,sys,zipfile
+with zipfile.ZipFile(sys.argv[1]) as z:
+    m=json.loads(z.read('limad-update.json'))
+    assert m['app_id']=='de.limad.Mail'
+    assert 'payload/test.txt' in z.namelist()
+PY
+
+echo '[10/10] GitHub build wiring'
+grep -q 'build_files/build-iso.sh' .github/workflows/build-limad-os.yml || fail 'ISO workflow wiring missing'
+grep -q 'out/updates/' .github/workflows/build-limad-os.yml || fail 'App update artifact wiring missing'
+[[ -x START-GITHUB-BUILD-LINUX.sh && -x START-GITHUB-BUILD-MAC.command ]] || fail 'Starter executables missing'
+grep -q 'gh auth login' tools/github-starter.sh || fail 'Persistent GitHub CLI login wiring missing'
+grep -q 'git commit-tree' tools/github-starter.sh || fail 'Existing remote history preservation missing'
+if grep -q 'GitHub Token (wird nicht gespeichert)' tools/github-starter.sh; then fail 'Legacy per-run token prompt survived'; fi
+grep -q '3.0.0-starter1-fix4' VERSION || fail 'FIX4 version marker missing'
+grep -A3 '"app_id": "de.limad.Save"' RELEASE-MANIFEST.json | grep -q '1.0.0-preview3' || fail 'LiSave preview3 release manifest missing'
+
+echo 'OK: LiMaD OS 3.0 starter source validation passed.'

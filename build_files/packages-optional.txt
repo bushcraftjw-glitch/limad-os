@@ -1,0 +1,4 @@
+gnome-shell-extension-blur-my-shell
+deskflow
+mangohud
+fastfetch

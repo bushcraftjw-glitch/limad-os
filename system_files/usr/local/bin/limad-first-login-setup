@@ -2,7 +2,7 @@
 # Applies LiMaD desktop defaults once per user/version. Existing settings
 # remain user-changeable after this one-time migration.
 set -u
-readonly VERSION="2.8.0-rc2-build5"
+readonly VERSION="3.0.0-starter1"
 readonly STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/limad"
 readonly MARKER="${STATE_DIR}/first-login-${VERSION}.done"
 [[ -e "$MARKER" ]] && exit 0

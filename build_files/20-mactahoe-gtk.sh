@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 
 # shellcheck source=/dev/null
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 readonly WORK="/tmp/limad-build/mactahoe"
 readonly SRC_SHARE="/usr/share/limad-source/mactahoe-gtk-theme"
@@ -320,70 +320,34 @@ else
 fi
 
 if [[ "${LIMAD_INSTALL_GDM_THEME}" == "1" ]]; then
-  echo ":: Enforcing and branding GDM for the Bazzite GNOME base"
+  echo ":: Applying LiMaD MacTahoe branding to Ubuntu GDM"
 
-  [[ "${BASE_IMAGE_REF}" == *bazzite-gnome* ]] || {
-    echo "FATAL: LiMaD GNOME expects a bazzite-gnome base, got ${BASE_IMAGE_REF}" >&2
-    exit 1
-  }
-  [[ -f /usr/lib/systemd/system/gdm.service ]] || {
-    echo "FATAL: gdm.service is missing from the Bazzite GNOME base" >&2
-    exit 1
-  }
+  GDM_UNIT=""
+  for candidate in /usr/lib/systemd/system/gdm3.service /lib/systemd/system/gdm3.service /usr/lib/systemd/system/gdm.service; do
+    if [[ -f "$candidate" ]]; then GDM_UNIT="$candidate"; break; fi
+  done
+  [[ -n "$GDM_UNIT" ]] || { echo "FATAL: Ubuntu GDM service is missing" >&2; exit 1; }
 
   systemctl disable sddm.service plasmalogin.service >/dev/null 2>&1 || true
-  systemctl enable gdm.service >/dev/null
+  systemctl enable "$(basename "$GDM_UNIT")" >/dev/null 2>&1 || true
   install -d /etc/systemd/system
-  ln -sfn /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
-
+  ln -sfn "$GDM_UNIT" /etc/systemd/system/display-manager.service
   ACTIVE_DM="$(readlink -f /etc/systemd/system/display-manager.service || true)"
-  [[ "$ACTIVE_DM" == /usr/lib/systemd/system/gdm.service ]] || {
-    echo "FATAL: Bazzite GNOME display manager is not GDM: ${ACTIVE_DM:-missing}" >&2
-    exit 1
-  }
-  echo "   active display manager: ${ACTIVE_DM}"
-
-  # MacTahoe's full_sudo() does not inspect EUID. It only tests whether /root
-  # is writable. In an OSTree container /root can be a dangling symlink during
-  # the build, so create its symlink target temporarily and remove it again
-  # after the GDM resource has been generated.
-  ROOT_TARGET=""
-  ROOT_TARGET_CREATED=0
-  if [[ -L /root && ! -w /root ]]; then
-    ROOT_LINK="$(readlink /root)"
-    if [[ "$ROOT_LINK" == /* ]]; then
-      ROOT_TARGET="$ROOT_LINK"
-    else
-      ROOT_TARGET="$(readlink -m "/root${ROOT_LINK:+/${ROOT_LINK}}")"
-    fi
-    if [[ ! -e "$ROOT_TARGET" ]]; then
-      install -d -m 0700 "$ROOT_TARGET"
-      ROOT_TARGET_CREATED=1
-    fi
-  fi
-  [[ -w /root ]] || {
-    echo "FATAL: /root is not writable, MacTahoe GDM privilege detection would fail" >&2
-    exit 1
-  }
+  [[ "$ACTIVE_DM" == "$GDM_UNIT" ]] || { echo "FATAL: display manager link was not set to GDM" >&2; exit 1; }
 
   GDM_RESOURCE="/usr/share/gnome-shell/gnome-shell-theme.gresource"
   GDM_BACKGROUND="/usr/share/backgrounds/limad/${LIMAD_DEFAULT_WALLPAPER}"
-  [[ -s "$GDM_RESOURCE" ]] || { echo "FATAL: GNOME Shell GDM resource missing: $GDM_RESOURCE" >&2; exit 1; }
+  [[ -s "$GDM_RESOURCE" ]] || { echo "FATAL: GNOME Shell theme resource missing: $GDM_RESOURCE" >&2; exit 1; }
   [[ -s "$GDM_BACKGROUND" ]] || { echo "FATAL: LiMaD GDM background missing: $GDM_BACKGROUND" >&2; exit 1; }
   BEFORE_SHA256="$(sha256sum "$GDM_RESOURCE" | awk '{print $1}')"
 
   if ! ./tweaks.sh -g -b "$GDM_BACKGROUND" -nd -nb -c dark -t purple >"$LOG" 2>&1; then
-    echo "FATAL: MacTahoe GDM theming failed" >&2
+    echo "FATAL: MacTahoe GDM theming failed on Ubuntu" >&2
     tail -n 40 "$LOG" 2>/dev/null | sed 's/^/   | /' >&2 || true
     exit 1
   fi
-
-  [[ -s "$GDM_RESOURCE" ]] || { echo "FATAL: GDM resource disappeared after theming" >&2; exit 1; }
   AFTER_SHA256="$(sha256sum "$GDM_RESOURCE" | awk '{print $1}')"
-  [[ "$AFTER_SHA256" != "$BEFORE_SHA256" ]] || {
-    echo "FATAL: GDM resource did not change; login branding was not applied" >&2
-    exit 1
-  }
+  [[ "$AFTER_SHA256" != "$BEFORE_SHA256" ]] || { echo "FATAL: GDM resource did not change" >&2; exit 1; }
 
   install -d /usr/share/limad
   cat > /usr/share/limad/gdm-branding.env <<EOF
@@ -394,10 +358,6 @@ LIMAD_GDM_ORIGINAL_SHA256="${BEFORE_SHA256}"
 LIMAD_GDM_BRANDED_SHA256="${AFTER_SHA256}"
 LIMAD_GDM_BACKGROUND="${GDM_BACKGROUND}"
 EOF
-
-  if [[ "$ROOT_TARGET_CREATED" == "1" ]]; then
-    rm -rf "$ROOT_TARGET"
-  fi
   echo "   GDM theme applied with LiMaD background"
 fi
 

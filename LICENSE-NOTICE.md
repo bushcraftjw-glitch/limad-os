@@ -6,9 +6,10 @@ der genaue Commit landen beim Bau im Image unter `/usr/share/limad-source/`.
 
 ## Basissystem
 
-**Bazzite / Universal Blue** – <https://github.com/ublue-os/bazzite>
-Lizenz: Apache-2.0 (Projektdateien) sowie die Lizenzen der enthaltenen
-Fedora-Pakete. Basis-Image: `ghcr.io/ublue-os/bazzite-gnome:stable`.
+**Ubuntu 26.04 LTS / GNOME** – LiMaD OS 3.0 wird aus der offiziellen Ubuntu-Desktop-ISO
+für AMD64 abgeleitet. Ubuntu, GNOME und alle eingebundenen Debian/Ubuntu-Pakete
+behalten ihre jeweiligen Lizenzen und Markenrechte. LiMaD OS ist kein offizielles
+Ubuntu-Produkt.
 
 ## Design
 
@@ -27,7 +28,7 @@ werden keine Dateien aus diesen Projekten in diesem Repository mitgeliefert.
 ## Bildschirmübertragung
 
 **GNOME Network Displays** – <https://gitlab.gnome.org/GNOME/gnome-network-displays>  
-Lizenz: GPL-3.0-or-later. Wird als Fedora-Systempaket eingebunden und stellt die native Google-Cast- und Miracast-Übertragung bereit.
+Lizenz: GPL-3.0-or-later. Wird als Ubuntu-Systempaket eingebunden und stellt die native Google-Cast- und Miracast-Übertragung bereit.
 
 **Doubletake** – <https://github.com/omarroth/doubletake>  
 Lizenz: LGPL-3.0-or-later sowie GPL-3.0-or-later für übernommene Bestandteile. Verwendeter Stand: Tag `v0.4.0`, Commit `364ea84247ce17a084ae15b9011409910e823e34`. Doubletake wird ausschließlich als experimenteller AirPlay-Sender verwendet, nicht automatisch gestartet und nicht für produktive oder sicherheitskritische Umgebungen freigegeben. Lizenztexte und Herkunftsnachweis werden beim Build im Image installiert.

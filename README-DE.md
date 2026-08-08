@@ -1,95 +1,85 @@
-# LiMaD OS 2.8.0 RC2 Build 5 – LiNotes und Study-Wachtturm-Korrektur
+# LiMaD OS 3.0 – Ubuntu 26.04 LTS GitHub Starter
 
-## Aktueller Zusatzstand
+Dieses Repository ist der neue Ubuntu-basierte Build-Unterbau für LiMaD OS.
 
-- LiDrop 0.12.0-preview5 verbindet zwei LiMaD-OS-Rechner automatisch in beide Richtungen.
-- Dateien werden direkt im lokalen Netzwerk übertragen und unter `Downloads/LiDrop` gespeichert.
-- Avahi-Suche, Fortschrittsanzeige und SHA-256-Prüfung sind integriert.
-- LiMaD Study 6.6.3, LiNotes preview2 und Windows-Programme 2.2.6 sind fest eingebaut.
+**Version:** `3.0.0-starter1-fix4`  
+**Basis:** Ubuntu 26.04 LTS AMD64 / GNOME 50  
+**Ziel:** Den bestätigten LiMaD-Desktop und die LiMaD-Programme möglichst verlustfrei von Bazzite/Fedora auf Ubuntu migrieren.
 
+## Was der GitHub-Build erzeugt
 
-Dieses Repository ist das vollständige GitHub-/ISO-Buildpaket für **RC2 Build 5**. Es basiert auf Build 4 und behält LiSave, Zen als deutschen Hauptbrowser, `Downloads/LiDrop`, LiLink, den vollständigen GStreamer-Unterbau und alle bisherigen LiMaD-Anwendungen bei.
+Nach erfolgreichem Workflow stehen zwei Artefakte bereit:
 
-## Neu in Build 5
+1. `LiMaD-OS-3.0-ISO`
+   - `LiMaD-OS-3.0.0-starter1-fix4-amd64.iso`
+   - SHA256-Datei
+   - Build-Info
+2. `LiMaD-OS-3.0-App-Updates`
+   - separate `.limad-update.zip` für alle im LiMaD-Updater geführten Komponenten
+   - SHA256-Dateien
 
-### LiNotes 1.0.0-preview2
-
-LiNotes ist eine native GTK4-Notizen-App im LiMaD-Design mit gelbem Post-it-Symbol.
-
-Enthalten sind:
-
-- Ordner, Schnellnotizen und „Alle Notizen“
-- angepinnte Notizen
-- Suche
-- Listen- und Galerieansicht
-- automatische Speicherung
-- einfache Textformatierung und Checklisten
-- Dateianhänge als normale, zugängliche Dateien
-- Papierkorb mit Wiederherstellung
-- Import aus TXT, Markdown, HTML, RTF und ENEX
-- Export als TXT, Markdown oder HTML
-- LiLink-Handoff für Notizen und Importdateien
-- vollständige Aufnahme in LiSave
-- offizieller Zugriff auf Apple Notizen über iCloud im Zen Browser
-
-LiNotes verwendet lokal eine SQLite-Datenbank unter `~/.local/share/limad-notes`. Apple stellt keine allgemeine native Linux-Schnittstelle für eine direkte Zwei-Wege-Synchronisation seiner Notizen-Datenbank bereit. Deshalb wird keine unzuverlässige Apple-Synchronisation vorgetäuscht: bestehende Apple-Notizen werden offiziell über iCloud in Zen geöffnet; über die unterstützten Import- und Exportformate können Inhalte übertragen werden.
-
-### LiMaD Study 6.6.3
-
-- Wachtturm-Fragen sind kleiner als der Absatztext, grau dargestellt und klar abgesetzt.
-- Die Fragennummer, einschließlich Bereiche wie `1–2.`, bleibt kräftig hervorgehoben.
-- Abstände und Antwortfelder wurden an die mobile Referenz angenähert.
-- **Zusammenkünfte → Wachtturm-Studium** ermittelt gezielt den Studienartikel der gewählten Woche.
-- Die Auflösung berücksichtigt direkte Dokumentverknüpfungen, Datumsbereiche, Studienartikelnummer, Wochenposition und Fragenbestand.
-- Ist die Zuordnung nicht direkt möglich, wird ein kontrollierter Fallback verwendet statt auf der Ausgabenübersicht stehenzubleiben.
-
-### Abhängige Aktualisierungen
-
-- LiSave **1.0.0-preview2** sichert LiNotes-Datenbank, Anhänge und Einstellungen.
-- LiLink **1.0.0-preview3** kann LiNotes öffnen und Notizen beziehungsweise Importdateien übergeben.
-- LiNotes ist in Dock, GNOME-Suche, App-Menü, LiMaD Update und First Login integriert.
-
-## Bestehender Stand aus Build 4
-
-- Zen Browser ist der deutsche Hauptbrowser.
-- LiSave erstellt verschlüsselte, inkrementelle Wiederherstellungsbackups.
-- LiDrop und LiLink empfangen dauerhaft unter `Downloads/LiDrop`.
-- `Downloads/LiDrop` und `Dokumente/LiLink Sync` erscheinen in Dateien/Nautilus.
-- GNOME Remote Desktop bildet den nativen Unterbau für LiLink.
-- GStreamer einschließlich `python3-gstreamer1`, GTK4-Sink und PipeWire ist verbindlicher Bestandteil des Basis-Builds.
-- Das Windows-Programme-Symbol ist über alle Größen und Skalierungen vereinheitlicht.
-
-## Versionsstände
-
-- LiMaD OS: 2.8.0 RC2 Build 5
-- LiNotes: 1.0.0-preview2
-- LiMaD Study: 6.6.3
-- LiSave: 1.0.0-preview2
-- LiLink: 1.0.0-preview3
-- LiDrop: 0.12.0-preview5
-- LiMaD Cut: 1.1.4
-- Windows-Programme: 2.2.6
-- LiMaD auf TV übertragen: 1.0.1
-
-## Offline prüfen
-
-```bash
-bash tests/validate.sh
-```
-
-Der vollständige Sammellauf benötigt mehr als 20 Minuten. In der Erstellungsumgebung wurde er bis zur Laufzeitgrenze fehlerfrei ausgeführt; die danach offenen Tests wurden einzeln vollständig durchgeführt.
-
-## GitHub-Build starten
-
-Unter Linux:
+## Linux Starter
 
 ```bash
 chmod +x START-GITHUB-BUILD-LINUX.sh
 ./START-GITHUB-BUILD-LINUX.sh
 ```
 
-Unter macOS kann `START-GITHUB-BUILD-MAC.command` gestartet werden.
+Der Starter prüft die Quellen und verwendet standardmäßig das bestehende Repository **`bushcraftjw-glitch/limad-os`**. Benutzer/Organisation und Repository sind bereits vorausgefüllt und können bei Bedarf überschrieben werden. Die Anmeldung läuft über **GitHub CLI (`gh`)**. Beim ersten Start öffnet sich einmalig die GitHub-Anmeldung im Browser; danach bleibt der Zugang dauerhaft über GitHub CLI gespeichert. Der Starter fragt nicht mehr bei jedem Lauf nach einem Token.
 
-## Testgrenze
+## macOS Starter
 
-Quellcode, Syntax, Datenbanklogik, Import, Anhänge, Papierkorb, App-Integration, LiSave, LiLink, aktuelle-Woche-Auflösung, Dock, Updater und alle bisherigen Offline-Regressionstests wurden geprüft. Nicht als real hardwaregetestet gelten der fertige GitHub-ISO-Build, eine echte JWPUB der betreffenden Woche, die visuelle Darstellung auf deinem Display, iCloud-Anmeldung sowie eine reale Clean-Install-Wiederherstellung.
+Im Finder `START-GITHUB-BUILD-MAC.command` doppelklicken oder im Terminal:
+
+```bash
+chmod +x START-GITHUB-BUILD-MAC.command
+./START-GITHUB-BUILD-MAC.command
+```
+
+macOS baut die Linux-ISO nicht lokal. Der Starter lädt die Quellen nach GitHub; der eigentliche Ubuntu-ISO-Build läuft auf dem GitHub-Linux-Runner.
+
+## Standard-Repository
+
+```text
+https://github.com/bushcraftjw-glitch/limad-os
+```
+
+Der Linux- und macOS-Starter setzen dieses Repository automatisch als `origin`.
+
+## GitHub-Anmeldung
+
+Der Starter verwendet `gh auth`. Falls noch keine Anmeldung gespeichert ist, wird automatisch `gh auth login --hostname github.com --git-protocol https --web` gestartet. Danach richtet `gh auth setup-git` die Git-Anmeldung ein. Zugangsdaten werden **nicht** in diesem Repository oder in der Remote-URL abgelegt.
+
+Bei einem bereits vorhandenen Repository wird zuerst dessen `main`-Historie eingelesen und der neue LiMaD-Stand als Fast-Forward darauf aufgebaut. Dadurch wird der frühere Fehler `main -> main (fetch first)` vermieden, ohne die bestehende GitHub-Historie per Force-Push zu überschreiben.
+
+## Wichtige 3.0-Regeln
+
+- Kein Bazzite, rpm-ostree oder bootc im neuen Buildpfad.
+- Bootsplash/Plymouth, Wallpaper und LiMaD-Icons sind per SHA256-Lock geschützt.
+- Der alte Installer-Kontrastfehler wird nicht portiert: keine globale Installer-CSS und kein Weiß-auf-Weiß-Theme.
+- LiMaD-Apps sind unabhängig vom OS aktualisierbar.
+- Windows-Programme bleiben zunächst auf der alten integrierten 2.2.6-Linie.
+- Steam, Lutris, GameMode, Gamescope und Vulkan-Runtimes werden nativ installiert.
+- Steam verwaltet offizielles Proton; ProtonUp-Qt wird zusätzlich für GE-Proton bereitgestellt.
+- Deskflow wird automatisch über Flathub eingerichtet.
+
+## Quellstruktur
+
+```text
+.github/workflows/        GitHub Actions
+build_files/              Ubuntu-RootFS/ISO-Build
+system_files/             LiMaD Systemdateien und Apps
+tools/                    Updatepaket- und GitHub-Starter-Werkzeuge
+tests/                    statische Schutz- und Migrationsprüfungen
+docs/                     Buildregeln und Referenzen
+```
+
+## Sicherheits-/Qualitätsstatus
+
+Der Repository-Stand wird statisch validiert. Ein vollständiger Ubuntu-ISO-Build ist erst dann technisch bestätigt, wenn der GitHub-Workflow einmal erfolgreich durchgelaufen ist. `starter1` ist deshalb absichtlich noch kein RC oder finales LiMaD OS 3.0.
+
+Siehe `docs/BUILD-LIST-DE.md` für die verbindliche Migrationsliste.
+
+## Ubuntu-26.04-Layer-Aufbau
+
+Ubuntu 26.04 Desktop verwendet mehrere aufeinander aufbauende SquashFS-Schichten. Der Builder bearbeitet deshalb **nicht** einen unvollständigen Layer isoliert: Er setzt `minimal.squashfs` und `minimal.standard.squashfs` als Overlay zu einem vollständigen RootFS zusammen. Alle LiMaD-Änderungen werden ausschließlich in den Standard-Upper-Layer geschrieben und anschließend wieder als `minimal.standard.squashfs` gepackt. Die originalen Sprach-, Live- und Enhanced-Secure-Boot-Layer bleiben darüber erhalten.

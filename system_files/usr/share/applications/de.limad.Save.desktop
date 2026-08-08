@@ -12,7 +12,7 @@ Categories=System;Utility;Archiving;
 Keywords=Backup;Sicherung;Wiederherstellung;USB;Zen;Study;Mail;
 StartupNotify=true
 StartupWMClass=de.limad.Save
-X-LiMaD-Version=1.0.0-preview2
+X-LiMaD-Version=1.0.0-preview3
 
 [Desktop Action Update]
 Name=Nach Updates suchen

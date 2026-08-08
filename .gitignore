@@ -1,5 +1,7 @@
-output/
+.work/
+out/
 *.iso
-__pycache__/
+*.iso.sha256
 .DS_Store
-.github-target
+__pycache__/
+*.pyc

@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 # shellcheck source=/dev/null
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 readonly SCHEMA_DIR="/usr/share/glib-2.0/schemas"
 
@@ -42,15 +42,11 @@ if [[ ! -d /usr/share/gnome-shell/extensions/user-theme@gnome-shell-extensions.g
   echo "   WARNING: user-theme extension missing, shell keeps the default theme" >&2
 fi
 
-# Packages can silently disappear from the Fedora repos between builds (this
-# happened to gnome-shell-extension-logo-menu on 2026-07-22: dnf skipped it
-# with "package not available" and the build otherwise sailed through, since
-# a missing runtime package is not by itself a build error). Listing an
-# extension in enabled-extensions that was never actually installed leaves
-# the visible result silently wrong (Activities button stays default) with
-# no build-time signal. Prune any extension that did not make it onto disk
-# before the default is written, so the shipped default always matches what
-# actually got installed.
+# Extensions can disappear or change between distribution releases. Listing
+# an extension in enabled-extensions that was never actually installed leaves
+# the visible result silently wrong. Prune any extension that did not make it
+# onto disk before the default is written, so the shipped default always
+# matches what actually got installed.
 declare -A LIMAD_EXTENSION_DIRS=(
   [user-theme@gnome-shell-extensions.gcampax.github.com]=1
   [dash-to-dock@micxgx.gmail.com]=1
@@ -89,22 +85,19 @@ fi
 
 if [[ -n "$WALLPAPER" ]]; then
   echo "   ${WALLPAPER}"
-  # A late filename alone is not sufficient: the Bazzite base currently ships
-  # another wallpaper override that still wins over a simple zz- prefix. The
-  # helper writes a canonical LiMaD override and normalizes every existing
-  # override that defines the same wallpaper keys. Whichever file GLib applies
-  # last therefore points to the same LiMaD image.
-  python3 /ctx/build_files/enforce-gnome-wallpaper.py "${SCHEMA_DIR}" "${WALLPAPER}"
+  # A late filename alone is not sufficient when the base system ships another
+  # wallpaper override. The helper writes a canonical LiMaD override and
+  # normalizes every existing override that defines the same wallpaper keys.
+  python3 /opt/limad-build/enforce-gnome-wallpaper.py "${SCHEMA_DIR}" "${WALLPAPER}"
 else
   echo "   FATAL: no LiMaD wallpaper found" >&2
   exit 1
 fi
 
-# Preserve the already installed FIX22 window design exactly. Fedora/Bazzite
-# can add a later schema override with right-side buttons; normalize only this
-# one key so every upstream override resolves to the confirmed FIX22 layout.
-python3 /ctx/build_files/enforce-gnome-button-layout.py "${SCHEMA_DIR}"
-python3 /ctx/build_files/enforce-gnome-favorite-apps.py "${SCHEMA_DIR}"
+# Preserve the already installed FIX22 window design exactly. Normalize only
+# this one key so every upstream override resolves to the confirmed layout.
+python3 /opt/limad-build/enforce-gnome-button-layout.py "${SCHEMA_DIR}"
+python3 /opt/limad-build/enforce-gnome-favorite-apps.py "${SCHEMA_DIR}"
 
 # The base image can ship preseeded dconf values which are stronger than GLib
 # schema defaults. Install an unlocked system dconf database as a second layer;
@@ -154,9 +147,8 @@ fi
 command -v dconf >/dev/null 2>&1 && dconf update || true
 
 # Logo Menu has changed its custom-icon switch between releases. In addition
-# to the settings above, overwrite every Bazzite-named built-in logo with the
-# LiMaD L. This makes the visible button correct even when an upstream schema
-# change causes the extension to fall back to its bundled Bazzite selection.
+# to the settings above, overwrite any bundled distro logo assets with the
+# LiMaD L so a fallback can never expose foreign distribution branding.
 LOGOMENU_DIR=/usr/share/gnome-shell/extensions/logomenu@aryan_k
 if [[ -d "$LOGOMENU_DIR" ]]; then
   mapfile -t UPSTREAM_LOGOS < <(find "$LOGOMENU_DIR" -type f \
@@ -175,7 +167,7 @@ SVG
     esac
   done
   install -m 0644 /usr/share/icons/LiMaD/64x64/apps/limad-start.png "$LOGOMENU_DIR/limad-logo.png"
-  printf '%s\n' "${#UPSTREAM_LOGOS[@]} built-in Fedora/Bazzite Logo Menu asset(s) replaced"
+  printf '%s\n' "${#UPSTREAM_LOGOS[@]} built-in distro Logo Menu asset(s) replaced"
 fi
 
 # Make every shipped wallpaper selectable in Settings -> Appearance.
@@ -190,10 +182,8 @@ if [[ -f /usr/share/gnome-background-properties/limad-wallpapers.xml ]]; then
 fi
 
 echo ":: Compiling GLib schemas"
-# In an OSTree image /root is a symlink to /var/roothome, which does not exist
-# during the build. Nothing may be written there. gsettings only has to read
-# the compiled defaults, so it gets a throwaway home and the memory backend -
-# that way it never tries to open a real dconf database.
+# gsettings only has to read the compiled defaults during the image build. Give
+# it a throwaway home and memory backend so no real root dconf database is used.
 export HOME="/tmp/limad-gsettings/home"
 export XDG_CACHE_HOME="/tmp/limad-gsettings/cache"
 export XDG_RUNTIME_DIR="/tmp/limad-gsettings/run"

@@ -131,7 +131,7 @@ details.settings-block summary{cursor:pointer;font-weight:750}
 .actions{display:flex;gap:10px}
 @media(max-width:900px){.clean-workspace{grid-template-columns:1fr;width:min(720px,calc(100% - 28px));margin-top:20px}.topbar{padding:0 15px}.network-pill{display:none}.share-card,.transfers-card{padding:18px}}
 @media(max-width:600px){body{font-size:14px}.topbar{height:64px}.brand-mark{width:38px;height:38px;border-radius:12px}.brand h1{font-size:19px}.top-actions .soft-button{display:none}.clean-workspace{width:calc(100% - 18px);margin:10px auto 25px;gap:10px}.share-card,.transfers-card,.panel{border-radius:17px}.share-heading p{display:none}.device-bubbles{padding:16px 0 12px}.device-bubble{min-width:85px}.device-avatar{width:48px;height:48px}.clean-drop{min-height:210px;padding:20px}.clean-transfer{grid-template-columns:auto minmax(0,1fr) auto;gap:9px}.clean-transfer .row-delete{display:none}.status-text{grid-column:3}.clean-transfer select{grid-column:2/4;width:100%;max-width:none}.folder-button{font-size:0;width:39px;height:39px;padding:0}.folder-button:after{content:"↗";font-size:18px}.pairing{grid-template-columns:1fr;text-align:center}.qr{margin:auto;width:190px;height:190px}.code{font-size:30px}.modal-body{padding:15px}.airdrop-controls{align-items:stretch;flex-direction:column}.airdrop-controls>*{width:100%}.progress-details{font-size:10px}.mobile-clean{width:calc(100% - 16px);margin-top:9px}.mobile-clean .panel{border-radius:17px}.mobile-drop{min-height:200px}}
-/* Mobile long filename hardening — 0.12.0-preview4 */
+/* Mobile long filename hardening — 0.12.0-preview8 */
 html,body,.app-shell,.mobile-main{width:100%;max-width:100%;overflow-x:hidden}
 .topbar,.brand,.brand>div,.mobile-clean,.mobile-clean .panel,.clean-list,.transfer-progress,.progress-head,.progress-head>div,.progress-details,.clean-transfer,.transfer-copy,.item,.item>div:first-child{min-width:0;max-width:100%}
 .brand{flex:1 1 auto;overflow:hidden}
@@ -140,6 +140,10 @@ html,body,.app-shell,.mobile-main{width:100%;max-width:100%;overflow-x:hidden}
 .topbar>.status{flex:0 0 auto;white-space:nowrap}
 .item{display:grid;grid-template-columns:minmax(0,1fr) auto}
 .item-actions{min-width:max-content}
+.download-action{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;text-decoration:none;font-weight:750;border-radius:12px;padding:10px 15px;box-shadow:0 10px 30px rgba(112,70,220,.24);transition:transform .16s ease,opacity .16s ease}
+.download-action:active{transform:scale(.98)}
+.download-action.busy{opacity:.66;pointer-events:none}
+
 .progress-head strong,.item-title{display:block;max-width:100%}
 @media(max-width:600px){
   .mobile-clean .panel{overflow:hidden}
@@ -157,12 +161,12 @@ html,body,.app-shell,.mobile-main{width:100%;max-width:100%;overflow-x:hidden}
   .inline-progress>span{font-size:10px;max-width:125px;overflow:hidden;text-overflow:ellipsis}
   .item{grid-template-columns:minmax(0,1fr);align-items:start}
   .item-actions{width:100%;margin-top:10px}
-  .item-actions button{width:100%}
+  .item-actions button,.item-actions .download-action{width:100%}
 }
 @media(max-width:390px){
   .topbar>.status span:last-child{display:none}
   .progress-details [data-progress-eta]{display:none}
 }
 
-/* LiDrop 0.12.0-preview5 – LiMaD OS to LiMaD OS */
+/* LiDrop 0.12.0-preview8 – LiMaD OS to LiMaD OS */
 .peer-connect{margin-top:18px;padding-top:18px;border-top:1px solid rgba(177,134,255,.22);display:grid;gap:12px}.peer-connect label{display:grid;gap:6px;font-weight:700}.peer-connect input{width:100%;box-sizing:border-box;border:1px solid rgba(177,134,255,.28);background:#111020;color:#f6f2ff;border-radius:10px;padding:12px}.discovered-peers{display:grid;gap:8px}.discovered-peer{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;text-align:left;border:1px solid rgba(177,134,255,.22);background:#111020;color:#f6f2ff;border-radius:10px;padding:11px 12px}.discovered-peer span{font-size:.82rem;color:#aaa1bd;overflow-wrap:anywhere}.device-bubble[data-select-device^="peer:"] .device-avatar{background:linear-gradient(145deg,#7348c8,#a986ff)}

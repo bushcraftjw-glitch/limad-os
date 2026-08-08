@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
-VERSION = "1.0.0-preview2"
+VERSION = "1.0.0-preview3"
 APP_ID = "de.limad.Save"
 HOME = Path.home()
 CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
@@ -187,7 +187,37 @@ def ensure_repository(bundle: Path, password: str) -> None:
         restic(bundle, password, ["snapshots", "--json"], timeout=120)
 
 
-def directory_size(path: Path) -> int:
+ANALYSIS_EXCLUDED_DIR_NAMES = {
+    "cache", "Cache", ".cache", "startupCache", "crashes",
+    "shader-cache", "GPUCache", "Code Cache",
+}
+STUDY_EXCLUDED_DIR_NAMES = {"publications", "downloads", "catalog", "covers"}
+
+
+def analysis_excluded_directory(path: Path, categories: dict) -> bool:
+    if path.name in ANALYSIS_EXCLUDED_DIR_NAMES:
+        return True
+    parts = path.parts
+    for index, part in enumerate(parts[:-1]):
+        child = parts[index + 1]
+        if part == "limad-study" and child in STUDY_EXCLUDED_DIR_NAMES:
+            return True
+        if part == "limad-windows":
+            if child in {"prefix", "cache"} and not categories.get("windows_full", False):
+                return True
+            if child == "apps" and not categories.get("windows_full", False):
+                tail = parts[index + 2:]
+                if len(tail) >= 2 and tail[1] == "prefix":
+                    return True
+    if not categories.get("windows_full", False):
+        marker = ("com.usebottles.bottles", "data", "bottles", "bottles")
+        if any(parts[index:index + len(marker)] == marker for index in range(max(0, len(parts) - len(marker) + 1))):
+            return True
+    return False
+
+
+def directory_size(path: Path, categories: dict | None = None) -> int:
+    categories = {**DEFAULT_CATEGORIES, **(categories or {})}
     if not path.exists() or path.is_symlink():
         return 0
     if path.is_file():
@@ -197,10 +227,19 @@ def directory_size(path: Path) -> int:
             return 0
     total = 0
     for root, dirs, files in os.walk(path, followlinks=False):
-        dirs[:] = [name for name in dirs if name not in {"cache", "Cache", ".cache", "startupCache", "crashes"}]
+        root_path = Path(root)
+        kept = []
+        for name in dirs:
+            candidate = root_path / name
+            if not analysis_excluded_directory(candidate, categories):
+                kept.append(name)
+        dirs[:] = kept
         for name in files:
+            candidate = root_path / name
+            if analysis_excluded_directory(candidate.parent, categories):
+                continue
             try:
-                total += (Path(root) / name).stat().st_size
+                total += candidate.stat().st_size
             except OSError:
                 pass
     return total
@@ -252,8 +291,13 @@ def category_sources(categories: dict) -> dict[str, list[Path]]:
 def analyze(categories: dict | None = None) -> dict:
     categories = {**DEFAULT_CATEGORIES, **(categories or {})}
     sources = category_sources(categories)
-    sizes = {key: sum(directory_size(path) for path in values) for key, values in sources.items()}
-    return {"categories": sizes, "total": sum(sizes.values()), "sources": {key: [str(path) for path in values] for key, values in sources.items()}}
+    sizes = {key: sum(directory_size(path, categories) for path in values) for key, values in sources.items()}
+    return {
+        "categories": sizes,
+        "total": sum(sizes.values()),
+        "sources": {key: [str(path) for path in values] for key, values in sources.items()},
+        "backup_exclusions_applied": True,
+    }
 
 
 def command_json(args: list[str], default):
@@ -360,7 +404,7 @@ def create_stage(categories: dict) -> tuple[Path, dict]:
         "categories": categories,
         "sources": {key: [str(path) for path in values] for key, values in sources.items()},
         "flatpaks": flatpak_manifest(),
-        "rpmOstree": command_json(["rpm-ostree", "status", "--json"], {}),
+        "aptManual": run(["apt-mark", "showmanual"]).stdout.splitlines() if shutil.which("apt-mark") else [],
         "osRelease": Path("/etc/os-release").read_text(encoding="utf-8", errors="replace") if Path("/etc/os-release").is_file() else "",
     }
     save_json(stage / "manifest.json", manifest)

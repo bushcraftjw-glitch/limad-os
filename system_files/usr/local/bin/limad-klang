@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-exec /usr/bin/python3 /usr/share/limad-klang/limad_klang.py "$@"
+SYSTEM_ROOT="/usr/share/limad-klang"
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.Klang/current/payload"
+APP_ROOT="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" "limad_klang.py")"
+export LIMAD_KLANG_ROOT="$APP_ROOT"
+exec /usr/bin/python3 "$APP_ROOT/limad_klang.py" "$@"

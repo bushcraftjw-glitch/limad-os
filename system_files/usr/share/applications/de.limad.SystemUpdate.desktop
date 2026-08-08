@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=LiMaD System aktualisieren
-Comment=LiMaD OS prüfen und atomar aktualisieren
+Comment=LiMaD OS und Ubuntu-Systempakete aktualisieren
 Exec=/usr/local/bin/limad-system-update
 TryExec=/usr/local/bin/limad-system-update
 Icon=de.limad.Settings
 Terminal=true
 Categories=System;
-Keywords=Update;Aktualisierung;rpm-ostree;
+Keywords=Update;Aktualisierung;APT;Ubuntu;

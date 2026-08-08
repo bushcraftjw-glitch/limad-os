@@ -4,34 +4,11 @@ LOG_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/limad"
 LOG_FILE="$LOG_DIR/system-update.log"
 mkdir -p "$LOG_DIR"
 exec > >(tee -a "$LOG_FILE") 2>&1
-printf '\n[%s] LiMaD system update started\n' "$(date -Is)"
+printf '\n[%s] LiMaD OS 3.0 system update started\n' "$(date -Is)"
 if command -v limad-save-cli >/dev/null 2>&1; then
-  echo "LiSave prüft, ob vor dem Systemupdate eine Sicherung vorgesehen ist …"
-  if ! limad-save-cli pre-update; then
-    echo "LiSave konnte die konfigurierte Sicherung nicht erstellen. Das Systemupdate wurde aus Sicherheitsgründen nicht gestartet."
-    exit 1
-  fi
+  echo 'LiSave prüft die konfigurierte Sicherung vor dem Systemupdate …'
+  limad-save-cli pre-update || { echo 'LiSave-Sicherung fehlgeschlagen; Update abgebrochen.'; exit 1; }
 fi
-if ! command -v rpm-ostree >/dev/null 2>&1; then
-  echo "Fehler: rpm-ostree ist nicht verfügbar."
-  exit 127
-fi
-set +e
-OUTPUT="$(rpm-ostree upgrade 2>&1)"
-RC=$?
-set -e
-printf '%s\n' "$OUTPUT"
-if [[ $RC -eq 0 ]]; then
-  echo "Systemaktualisierung erfolgreich. Bitte neu starten, wenn eine neue Bereitstellung angezeigt wird."
-  exit 0
-fi
-if grep -Eqi 'unauthorized|invalid username/password|unable to retrieve auth token' <<<"$OUTPUT"; then
-  cat <<'MSG'
-
-Das LiMaD-Containerpaket ist in GHCR nicht öffentlich erreichbar.
-Das ist kein Passwortfehler auf diesem Computer. Das Paket muss auf GitHub
-unter Packages -> limad-os-gnome-280 -> Package settings -> Change visibility
-auf Public gestellt werden. Danach funktioniert die Aktualisierung ohne Login.
-MSG
-fi
-exit "$RC"
+CMD='apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y full-upgrade && apt-get -y autoremove'
+if command -v pkexec >/dev/null 2>&1; then exec pkexec sh -c "$CMD"; fi
+exec sudo sh -c "$CMD"

@@ -308,7 +308,7 @@ function topbar(sub = 'Direkt im lokalen WLAN') {
 function adminView() {
   app.innerHTML = `<div class="desktop-shell">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">⇅</div><div><h1>LiDrop</h1><small>0.12.0-preview5</small></div></div>
+      <div class="brand"><div class="brand-mark">⇅</div><div><h1>LiDrop</h1><small>0.12.0-preview8</small></div></div>
       <div class="top-actions">
         <div id="networkStatus" class="network-pill"><span class="dot"></span><span>Verbunden</span></div>
         <button id="openFolderTop" class="soft-button">LiDrop-Ordner</button>
@@ -728,78 +728,27 @@ async function mobileSend(files) {
   await runUploadQueue(files, 'inbound', '', refreshMobile);
 }
 
-async function downloadFile(transfer, button) {
-  if (activeTransferController) return;
-  const box = $('#uploadProgress');
-  activeTransferController = new AbortController();
-  const controller = activeTransferController;
-  button.disabled = true;
-  button.textContent = 'Wird geladen …';
-  $('[data-progress-cancel]', box).onclick = () => controller.abort();
-  setProgress(box, { phase: 'preparing', file: transfer.filename, received: 0, total: transfer.size, rate: 0 });
-  try {
-    const started = performance.now();
-    const response = await fetch(transfer.downloadUrl, { headers: authHeaders(), signal: controller.signal });
-    if (!response.ok) throw new Error(`Download fehlgeschlagen: HTTP ${response.status}`);
-    const total = Number(response.headers.get('content-length')) || Number(transfer.size) || 0;
-    const reader = response.body?.getReader();
-    if (!reader) {
-      const blob = await response.blob();
-      saveBlob(blob, transfer.filename);
-      setProgress(box, { phase: 'done', file: transfer.filename, received: blob.size, total: blob.size, rate: 0, eta: 0 });
-    } else {
-      let received = 0;
-      const chunks = [];
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        received += value.byteLength;
-        const elapsed = Math.max(.25, (performance.now() - started) / 1000);
-        const rate = received / elapsed;
-        setProgress(box, { phase: 'downloading', file: transfer.filename, received, total, rate, eta: rate ? (total - received) / rate : undefined });
-      }
-      setProgress(box, { phase: 'verifying', file: transfer.filename, received, total, rate: 0 });
-      saveBlob(new Blob(chunks), transfer.filename);
-      setProgress(box, { phase: 'done', file: transfer.filename, received: total, total, rate: 0, eta: 0 });
+function prepareNativeDownload(transfer, link) {
+  link.classList.add('busy');
+  link.textContent = 'Download wird geöffnet …';
+  toast(`${transfer.filename} wird an den Browser übergeben.`);
+  setTimeout(() => refreshMobile(), 1200);
+  setTimeout(() => {
+    if (document.body.contains(link)) {
+      link.classList.remove('busy');
+      link.textContent = 'Auf Handy speichern';
     }
-    toast(`${transfer.filename} wurde heruntergeladen.`);
-  } catch (error) {
-    if (error?.name === 'AbortError') {
-      setProgress(box, { phase: 'cancelled', file: transfer.filename, received: 0, total: transfer.size });
-      toast('Download wurde abgebrochen.');
-    } else {
-      setProgress(box, { phase: 'error', file: transfer.filename, received: 0, total: transfer.size });
-      toast(error.message || String(error), true);
-    }
-  } finally {
-    activeTransferController = null;
-    button.disabled = false;
-    button.textContent = 'Herunterladen';
-    await refreshMobile();
-    setTimeout(() => box.classList.add('hidden'), 1800);
-  }
-}
-
-function saveBlob(blob, name) {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = name;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }, 5000);
 }
 
 async function refreshMobile() {
   try {
     const current = await api('/api/mobile/state');
     const ready = current.outbound.filter((transfer) => transfer.status === 'ready');
-    $('#downloads').innerHTML = ready.length ? ready.map((transfer) => `<div class="item"><div><div class="item-title">${esc(transfer.filename)}</div><div class="item-meta">${fmt(transfer.size)}</div></div><div class="item-actions"><button data-download="${esc(transfer.id)}">Herunterladen</button></div></div>`).join('') : '<div class="empty">Der LiMaD-PC hat keine Datei bereitgestellt.</div>';
-    $$('[data-download]').forEach((button) => {
-      const transfer = ready.find((item) => item.id === button.dataset.download);
-      button.onclick = () => downloadFile(transfer, button);
+    $('#downloads').innerHTML = ready.length ? ready.map((transfer) => `<div class="item"><div><div class="item-title">${esc(transfer.filename)}</div><div class="item-meta">${fmt(transfer.size)}</div></div><div class="item-actions"><a class="download-action" data-download="${esc(transfer.id)}" href="${esc(transfer.downloadUrl)}" download="${esc(transfer.filename)}">Auf Handy speichern</a></div></div>`).join('') : '<div class="empty">Der LiMaD-PC hat keine Datei bereitgestellt.</div>';
+    $$('[data-download]').forEach((link) => {
+      const transfer = ready.find((item) => item.id === link.dataset.download);
+      link.onclick = () => prepareNativeDownload(transfer, link);
     });
     const historyItems = [...current.inbound, ...current.outbound].sort((a, b) => String(b.updated_at).localeCompare(String(a.updated_at))).slice(0, 8);
     $('#mobileHistory').innerHTML = historyItems.length ? historyItems.map((transfer) => `<div class="transfer-row clean-transfer"><div class="file-icon">${transfer.direction === 'inbound' ? '↑' : '↓'}</div><div class="transfer-copy"><div class="item-title">${esc(transfer.filename)}</div><div class="item-meta">${fmt(transfer.size)}</div>${transferProgress(transfer)}</div><span class="status-text ${['accepted','downloaded'].includes(transfer.status) ? 'good' : ''}">${statusLabel(transfer.status)}</span></div>`).join('') : '<div class="empty clean-empty">Noch keine Übertragung.</div>';

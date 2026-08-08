@@ -99,6 +99,33 @@
       "restart_user_services": []
     },
     {
+      "app_id": "de.limad.Mail",
+      "name": "LiMaD Mail",
+      "launcher": "/usr/local/bin/limad-mail",
+      "system_root": "/usr/share/limad-mail",
+      "system_version_file": "/usr/share/limad-mail/VERSION",
+      "required": [
+        "VERSION",
+        "theme/limad-mail.css",
+        "theme/limad-mail-content.css"
+      ],
+      "restart_user_services": []
+    },
+    {
+      "app_id": "de.limad.Klang",
+      "name": "LiMaD Klang",
+      "launcher": "/usr/local/bin/limad-klang",
+      "system_root": "/usr/share/limad-klang",
+      "system_version_file": "/usr/share/limad-klang/VERSION",
+      "required": [
+        "VERSION",
+        "limad_klang.py",
+        "limad_klang_backend.py",
+        "LiMaD Klang.json"
+      ],
+      "restart_user_services": []
+    },
+    {
       "app_id": "de.limad.AnycubicSlicerNext",
       "name": "Anycubic Slicer Next",
       "launcher": "/usr/bin/anycubicslicernext",

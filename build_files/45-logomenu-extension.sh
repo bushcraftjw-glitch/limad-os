@@ -3,7 +3,7 @@
 # install a release that does not declare compatibility with the GNOME Shell
 # major version in the base image.
 set -Eeuo pipefail
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 readonly EXT_UUID="logomenu@aryan_k"
 readonly EXT_DIR="/usr/share/gnome-shell/extensions/${EXT_UUID}"
@@ -89,7 +89,7 @@ for optional in prefs.js stylesheet.css constants.js display_module.js selection
 done
 
 if [[ -d "${EXT_DIR}/schemas" ]]; then
-  python3 /ctx/build_files/patch-logomenu-schema.py "${EXT_DIR}/schemas"
+  python3 /opt/limad-build/patch-logomenu-schema.py "${EXT_DIR}/schemas"
   glib-compile-schemas "${EXT_DIR}/schemas"
   install -d /usr/share/glib-2.0/schemas
   # A base image may already ship the same schema ID under another filename.

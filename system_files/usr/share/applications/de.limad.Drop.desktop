@@ -11,7 +11,7 @@ Categories=Network;FileTransfer;
 StartupNotify=true
 StartupWMClass=de.limad.Drop
 Keywords=Dateien;Senden;Empfangen;Smartphone;QR;WLAN;
-X-LiMaD-Version=0.12.0-preview5
+X-LiMaD-Version=0.12.0-preview8
 
 [Desktop Action Update]
 Name=Nach Updates suchen

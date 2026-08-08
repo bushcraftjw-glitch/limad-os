@@ -3,7 +3,7 @@
 # The components are installed but never enabled automatically: OWL takes exclusive
 # control of its Wi-Fi interface and must only use a separate compatible adapter.
 set -Eeuo pipefail
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 echo ":: Building optional AirDrop compatibility stack"
 work=/tmp/limad-airdrop-build

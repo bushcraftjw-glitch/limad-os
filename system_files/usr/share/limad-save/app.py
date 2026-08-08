@@ -267,9 +267,11 @@ class LiSaveApp(Gtk.Application):
         for key, size in result.get("categories", {}).items():
             if size:
                 lines.append(f"{labels.get(key, key)}: {self.format_size(size)}")
-        lines.append(f"\nTatsächlich zu sichern: {self.format_size(result.get('total', 0))}")
+        lines.append(f"\nZu sichernde Quelldaten: {self.format_size(result.get('total', 0))}")
+        lines.append("Backup-Ausschlüsse für Cache-, Download-, Katalog- und große Wine-Prefix-Daten sind bereits berücksichtigt.")
+        lines.append("Die fertige Backupgröße kann durch Komprimierung und Deduplizierung deutlich kleiner sein.")
         lines.append("Programme und neu ladbare Systembestandteile werden als Wiederherstellungsplan erfasst.")
-        self.status.set_text(lines[-2].strip())
+        self.status.set_text(lines[-4].strip())
         self.message("LiSave-Sicherungsanalyse", "\n".join(lines))
 
     def on_backup(self, *_):

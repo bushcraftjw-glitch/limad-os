@@ -8,7 +8,7 @@
 set -Eeuo pipefail
 
 # shellcheck source=/dev/null
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 # Step 30 recorded which WhiteSur theme really exists.
 if [[ -f /usr/share/limad/theme-names.env ]]; then

@@ -1,109 +1,124 @@
 {
   "product": "LiMaD OS",
-  "version": "2.8.0-rc2-gnome-rc2-build5",
-  "build_revision": "gnome-rc2-build5",
-  "release_name": "LiMaD OS 2.8.0 RC2 Build 5 – Allgemeine Intel-Mac-, Notebook- und PC-Edition mit LiDrop 0.12.0-preview5",
-  "base": "LiMaD OS 2.8.0 RC2 Build 4",
-  "iso_volume_id": "LIMAD_OS_280_RC2",
-  "components": {
-    "limad_study": "6.6.3",
-    "windows_programme": "2.2.6",
-    "limad_mail": "1.8",
-    "lidrop": "0.12.0-preview5",
-    "limad_cut": "1.1.4",
-    "limad_screen_share": "1.0.1",
-    "anycubic_slicer_next": "1.3.96",
-    "lilink": "1.0.0-preview3",
-    "lisave": "1.0.0-preview2",
-    "linotes": "1.0.0-preview2"
+  "version": "3.0.0-starter1-fix4",
+  "release_channel": "starter",
+  "build_status": {
+    "static_source_validation": "passed_10_of_10",
+    "full_github_iso_build": "not_yet_executed",
+    "hardware_install_validation": "not_yet_executed"
   },
-  "default_browser": {
-    "app_id": "app.zen_browser.zen",
-    "language": "de-DE",
-    "role": "primary"
+  "base": {
+    "distribution": "Ubuntu",
+    "version": "26.04 LTS",
+    "codename": "resolute",
+    "desktop": "GNOME 50",
+    "architecture": "amd64",
+    "iso": "ubuntu-26.04-desktop-amd64.iso",
+    "iso_sha256": "487f87faaf547ea30e0aba4d5b53346292571256b25333a978db1692bcee9dd2",
+    "layer_model": [
+      "casper/minimal.squashfs",
+      "casper/minimal.standard.squashfs"
+    ],
+    "modified_layer": "casper/minimal.standard.squashfs"
   },
-  "default_flatpaks": [
-    "app.zen_browser.zen",
-    "org.mozilla.thunderbird_esr",
-    "us.zoom.Zoom",
-    "app.ytmdesktop.ytmdesktop",
-    "org.libreoffice.LibreOffice",
-    "com.usebottles.bottles",
-    "com.github.wwmm.easyeffects",
-    "io.github.kolunmi.Bazaar"
-  ],
-  "updater_apps": [
-    "de.limad.Cut",
-    "de.limad.Study",
-    "de.limad.Drop",
-    "de.limad.Link",
-    "de.limad.Notes",
-    "de.limad.Save",
-    "de.limad.ScreenShare",
-    "de.limad.AnycubicSlicerNext",
-    "de.limad.WindowsApps"
-  ],
-  "status": "release-candidate",
-  "lilink": {
-    "version": "1.0.0-preview3",
-    "app_id": "de.limad.Link",
-    "service": "limad-link.service",
-    "gnome_extension": "lilink@limad.local",
-    "network_service": "_limad-link._tcp",
-    "port_range": "47888-47898",
-    "receive_folder": "Downloads/LiDrop"
+  "design_lock": {
+    "theme_lock_file": "tests/theme-lock.sha256",
+    "locked_file_count": 294,
+    "preserve_plymouth": true,
+    "preserve_wallpapers_icons_theme": true,
+    "installer_global_text_color_override": false
   },
-  "lidrop": {
-    "version": "0.12.0-preview5",
-    "receive_folder": "Downloads/LiDrop",
-    "nautilus_bookmark": true,
-    "legacy_migration": "~/LiDrop",
-    "os_to_os_transfer": true,
-    "bidirectional_pairing": true,
-    "discovery": "Avahi _limad-drop._tcp",
-    "integrity": "SHA-256 verification"
+  "independent_updates": {
+    "enabled": true,
+    "output_format": ".limad-update.zip",
+    "build_script": "tools/build-all-updates.sh",
+    "apps": [
+      {
+        "app_id": "de.limad.Cut",
+        "name": "LiMaD Cut",
+        "version": "1.1.4"
+      },
+      {
+        "app_id": "de.limad.Study",
+        "name": "LiMaD Study",
+        "version": "6.6.3"
+      },
+      {
+        "app_id": "de.limad.Drop",
+        "name": "LiDrop",
+        "version": "0.12.0-preview8"
+      },
+      {
+        "app_id": "de.limad.Link",
+        "name": "LiLink",
+        "version": "1.0.0-preview3"
+      },
+      {
+        "app_id": "de.limad.Notes",
+        "name": "LiNotes",
+        "version": "1.0.0-preview2"
+      },
+      {
+        "app_id": "de.limad.Save",
+        "name": "LiSave",
+        "version": "1.0.0-preview3"
+      },
+      {
+        "app_id": "de.limad.ScreenShare",
+        "name": "LiMaD auf TV übertragen",
+        "version": "1.0.1"
+      },
+      {
+        "app_id": "de.limad.Mail",
+        "name": "LiMaD Mail",
+        "version": "1.8",
+        "backend": "Mozilla Thunderbird"
+      },
+      {
+        "app_id": "de.limad.Klang",
+        "name": "LiMaD Klang",
+        "version": "1.0.0",
+        "backend": "EasyEffects integration"
+      },
+      {
+        "app_id": "de.limad.AnycubicSlicerNext",
+        "name": "Anycubic Slicer Next",
+        "version": "1.3.96"
+      },
+      {
+        "app_id": "de.limad.WindowsApps",
+        "name": "Windows-Programme",
+        "version": "2.2.6"
+      }
+    ]
   },
-  "lisave": {
-    "version": "1.0.0-preview2",
-    "engine": "restic",
-    "encrypted": true,
-    "incremental": true,
-    "default_schedule": "20:00 daily when target available",
-    "clean_install_detection": true,
-    "program_restore": "download from recorded sources",
-    "target": "second drive or removable media"
+  "gaming": {
+    "steam_native": true,
+    "official_proton": "managed_by_steam_on_demand",
+    "protonup_qt": true,
+    "lutris": true,
+    "gamemode": true,
+    "gamescope": true,
+    "vulkan_64_and_32_bit": true
   },
-  "gstreamer": {
-    "mandatory": true,
-    "python_bindings": "python3-gstreamer1",
-    "gtk4_sink": "gstreamer1-plugin-gtk4",
-    "required_element": "gtk4paintablesink"
+  "desktop_apps": {
+    "deskflow": true,
+    "zoom": true,
+    "ytm_desktop": true,
+    "libreoffice": true,
+    "zen_browser": true,
+    "thunderbird_based_limad_mail": true,
+    "bottles": true
   },
-  "linotes": {
-    "version": "1.0.0-preview2",
-    "app_id": "de.limad.Notes",
-    "storage": "~/.local/share/limad-notes",
-    "database": "SQLite",
-    "attachments": "normal files",
-    "apple_notes": "official iCloud access through Zen",
-    "lilink_handoff": true,
-    "lisave": true
+  "starters": {
+    "linux": "START-GITHUB-BUILD-LINUX.sh",
+    "macos": "START-GITHUB-BUILD-MAC.command",
+    "github_workflow": ".github/workflows/build-limad-os.yml"
   },
-  "study_watchtower": {
-    "question_typography": "smaller muted text with bold question number",
-    "current_week_article": "dated-text, article-number and week-index resolution",
-    "dark_library": "complete dark surfaces and controls"
-  },
-  "windows_programme": {
-    "version": "2.2.6",
-    "bottles_prefix": "robust Soda/Bottles prefix resolution",
-    "safety": "incomplete environments are not deleted automatically"
-  },
-  "validation": {
-    "offline_tests": "passed in batches",
-    "lidrop_two_service_test": "passed",
-    "lidrop_sha256_transfer": "passed",
-    "github_image_build": "pending",
-    "real_hardware_test": "pending"
-  }
+  "known_migration_notes": [
+    "Fedora/Bazzite/rpm-ostree/bootc runtime path removed from the Ubuntu build path.",
+    "LiDrop 0.12.0-preview8 is embedded from the supplied standalone update package; its internal SHA256SUMS validation passed before integration.",
+    "Windows-Programme deliberately remains at 2.2.6 until the Ubuntu base is proven on real hardware.",
+    "The first GitHub Actions ISO build and real hardware installation are still required before promoting starter1 to RC."
+  ]
 }

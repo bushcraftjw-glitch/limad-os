@@ -17,6 +17,8 @@ KNOWN_APPS = {
     "de.limad.Notes": "LiNotes",
     "de.limad.Save": "LiSave",
     "de.limad.ScreenShare": "LiMaD auf TV übertragen",
+    "de.limad.Mail": "LiMaD Mail",
+    "de.limad.Klang": "LiMaD Klang",
     "de.limad.AnycubicSlicerNext": "Anycubic Slicer Next",
     "de.limad.WindowsApps": "Windows-Programme",
 }

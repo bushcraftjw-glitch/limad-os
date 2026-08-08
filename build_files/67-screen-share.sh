@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 # shellcheck source=/dev/null
-source /ctx/build_files/versions.env
+source /opt/limad-build/versions.env
 
 echo ":: Installing LiMaD auf TV übertragen ${LIMAD_SCREEN_SHARE_VERSION}"
 

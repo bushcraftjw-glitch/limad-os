@@ -18,12 +18,13 @@ import threading
 import time
 import urllib.parse
 import urllib.request
+import unicodedata
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = "0.12.0-preview5"
+VERSION = "0.12.0-preview8"
 PORT = int(os.environ.get("LIMAD_DROP_PORT", "47777"))
 PAIR_TTL = 300
 PAIR_ATTEMPT_LIMIT = 8
@@ -45,8 +46,28 @@ def safe_name(value: str) -> str:
     name = "".join(ch for ch in name if ch >= " " and ch not in '<>:"/\\|?*')
     if name in {"", ".", ".."}:
         name = "Datei"
-    stem = name[:220]
-    return stem
+    if len(name) <= 220:
+        return name
+    suffix = "".join(Path(name).suffixes)
+    suffix = suffix[-80:] if len(suffix) > 80 else suffix
+    keep = max(1, 220 - len(suffix))
+    return f"{name[:keep]}{suffix}"
+
+
+def ascii_download_name(value: str) -> str:
+    original = safe_name(value)
+    normalized = unicodedata.normalize("NFKD", original)
+    fallback = normalized.encode("ascii", "ignore").decode("ascii")
+    fallback = "".join(ch for ch in fallback if 32 <= ord(ch) < 127 and ch not in '"\\')
+    fallback = fallback.strip().strip(".")
+    if not fallback:
+        suffix = "".join(Path(original).suffixes)
+        fallback = f"LiDrop-Datei{suffix}" if suffix else "LiDrop-Datei"
+    if len(fallback) > 220:
+        suffix = "".join(Path(fallback).suffixes)
+        keep = max(1, 220 - len(suffix))
+        fallback = f"{fallback[:keep]}{suffix}"
+    return fallback
 
 
 def xdg_download_dir(home: Path) -> Path:
@@ -1036,6 +1057,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Headers", "Authorization,Content-Type,X-LiMaD-Admin,X-File-Name,X-File-Size")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+        self.send_header("Access-Control-Expose-Headers", "Content-Length,Content-Disposition,Accept-Ranges,Content-Range")
         self.send_header("Access-Control-Allow-Private-Network", "true")
 
     def _send(self, status=200, data=None, content_type="application/json; charset=utf-8", headers=None):
@@ -1308,28 +1330,59 @@ class Handler(BaseHTTPRequestHandler):
         start, end = 0, size - 1
         status = 200
         range_header = self.headers.get("Range")
-        if range_header and range_header.startswith("bytes="):
+        if range_header and range_header.startswith("bytes=") and size:
             first, _, last = range_header[6:].partition("-")
-            start = int(first or 0); end = int(last or size - 1)
+            start = int(first or 0)
+            end = int(last or size - 1)
             end = min(end, size - 1)
             if start > end or start >= size:
                 return self._send(416, b"", "application/octet-stream", {"Content-Range": f"bytes */{size}"})
             status = 206
-        length = max(0, end - start + 1)
-        mime = mimetypes.guess_type(row["filename"])[0] or "application/octet-stream"
-        self.send_response(status); self._cors(); self.send_header("Content-Type", mime); self.send_header("Content-Length", str(length)); self.send_header("Accept-Ranges", "bytes"); self.send_header("Content-Disposition", f"attachment; filename*=UTF-8''{urllib.parse.quote(row['filename'])}")
-        if status == 206: self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        length = max(0, end - start + 1) if size else 0
+        quoted_name = urllib.parse.quote(row["filename"], safe="")
+        fallback_name = ascii_download_name(row["filename"])
+        self.send_response(status)
+        self._cors()
+        # User files are always transferred as opaque binary data. LiDrop must
+        # never reject, reinterpret or preview a file because its extension is
+        # unknown to Linux, Android, iOS or the browser.
+        self.send_header("Content-Type", "application/octet-stream")
+        self.send_header("Content-Length", str(length))
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Content-Disposition", f"attachment; filename=\"{fallback_name}\"; filename*=UTF-8''{quoted_name}")
+        if status == 206:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
         self.end_headers()
-        if self.command != "HEAD":
+
+        # A HEAD request is only a capability probe. Preview 5 marked the file
+        # as delivered even though no byte had reached the phone. Mobile
+        # browsers often probe an attachment before starting the real GET.
+        if self.command == "HEAD":
+            return
+
+        delivered = False
+        try:
+            remaining = length
             with path.open("rb") as handle:
-                handle.seek(start); remaining = length
+                handle.seek(start)
                 while remaining:
                     chunk = handle.read(min(1024 * 1024, remaining))
-                    if not chunk: break
-                    self.wfile.write(chunk); remaining -= len(chunk)
-        if start == 0 and end == size - 1:
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    remaining -= len(chunk)
+                self.wfile.flush()
+            delivered = remaining == 0
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            delivered = False
+
+        # Only a completed full GET may change the transfer to "downloaded".
+        # Interrupted downloads and range probes stay available for retry.
+        if delivered and start == 0 and end == size - 1:
             with STORE.connect() as db:
-                db.execute("UPDATE transfers SET status='downloaded',updated_at=? WHERE id=?", (now(), transfer_id))
+                db.execute("UPDATE transfers SET status='downloaded',received=size,error=NULL,updated_at=? WHERE id=?", (now(), transfer_id))
 
 
 def public_transfer(row):

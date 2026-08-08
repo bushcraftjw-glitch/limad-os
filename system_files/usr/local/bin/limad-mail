@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -u
+SYSTEM_ROOT="/usr/share/limad-mail"
+USER_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/limad-updater/apps/de.limad.Mail/current/payload"
+APP_ROOT="$(/usr/local/libexec/limad-select-app-root "$SYSTEM_ROOT" "$USER_ROOT" "VERSION")"
 DATA="$HOME/.local/share/limad-mail"
-SYSTEM_THEME="/usr/share/limad-mail/theme/limad-mail.css"
 STATE="$DATA/state"
 LOG="$HOME/.local/state/limad-mail/launcher.log"
 mkdir -p "$(dirname "$LOG")" "$STATE"
@@ -25,48 +27,37 @@ read_gtk_theme() {
 }
 {
   printf '\n[%s] LiMaD Mail Start\n' "$(date --iso-8601=seconds)"
-  /usr/local/bin/limad-mail-setup --quiet || true
+  LIMAD_MAIL_THEME_SOURCE="$APP_ROOT/theme/limad-mail.css" /usr/local/bin/limad-mail-setup --quiet || true
   MODE="$(cat "$STATE/launcher-mode" 2>/dev/null || true)"
   APP_ID="$(cat "$STATE/flatpak-id" 2>/dev/null || true)"
   GTK_THEME_NAME="$(read_gtk_theme)"
-  echo "GTK-Systemtheme (nur Referenz): $GTK_THEME_NAME"
+  echo "GTK-Systemtheme: $GTK_THEME_NAME"
   if [[ "$MODE" == "flatpak" ]]; then
     if [[ -z "$APP_ID" ]] || ! flatpak info "$APP_ID" >/dev/null 2>&1; then
       APP_ID="$(find_flatpak_id || true)"
       [[ -n "$APP_ID" ]] && printf '%s\n' "$APP_ID" > "$STATE/flatpak-id"
     fi
     if [[ -n "$APP_ID" ]]; then
-      echo "Startmodus: Flatpak $APP_ID"
-      flatpak run \
-        --env=GTK_APPLICATION_PREFER_DARK_THEME=1 \
-        "$APP_ID" "$@"
-      RC=$?
-      echo "Flatpak beendet mit Code $RC"
-      exit "$RC"
+      flatpak run --env=GTK_APPLICATION_PREFER_DARK_THEME=1 "$APP_ID" "$@"
+      exit $?
     fi
   fi
   if [[ "$MODE" == "native" ]] && command -v thunderbird >/dev/null 2>&1; then
-    echo "Startmodus: native ($(command -v thunderbird))"
     env GTK_APPLICATION_PREFER_DARK_THEME=1 thunderbird "$@"
     exit $?
   fi
   APP_ID="$(find_flatpak_id || true)"
   if [[ -n "$APP_ID" ]]; then
-    echo "Fallback: Flatpak $APP_ID"
     printf 'flatpak\n' > "$STATE/launcher-mode"
     printf '%s\n' "$APP_ID" > "$STATE/flatpak-id"
-    flatpak run \
-      --env=GTK_APPLICATION_PREFER_DARK_THEME=1 \
-      "$APP_ID" "$@"
+    flatpak run --env=GTK_APPLICATION_PREFER_DARK_THEME=1 "$APP_ID" "$@"
     exit $?
   fi
   if command -v thunderbird >/dev/null 2>&1; then
-    echo "Fallback: native ($(command -v thunderbird))"
     printf 'native\n' > "$STATE/launcher-mode"
     env GTK_APPLICATION_PREFER_DARK_THEME=1 thunderbird "$@"
     exit $?
   fi
-  echo "Fehler: Keine Thunderbird-Installation gefunden."
-  command -v notify-send >/dev/null 2>&1 && notify-send "LiMaD Mail" "Thunderbird konnte nicht gestartet werden. Siehe $LOG"
+  command -v notify-send >/dev/null 2>&1 && notify-send "LiMaD Mail" "Thunderbird konnte nicht gestartet werden."
   exit 1
 } >>"$LOG" 2>&1
